@@ -1,9 +1,7 @@
-import { makeScene2D, Code, Line, Rect } from '@motion-canvas/2d';
-import {
-  all, waitFor, createRef, createSignal, easeInOutCubic,
-} from '@motion-canvas/core';
-import { BASE } from '../styles/palette';
-import { PillLabel } from '../components/PillLabel';
+import { makeScene2D, Code, Line, Rect, Layout } from "@motion-canvas/2d";
+import { all, waitFor, createRef, createSignal, easeInOutCubic } from "@motion-canvas/core";
+import { BASE } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
 
 const CODE_SNIPPET = `async preprocessCode({ codeBlock, config }) {
 				if (shouldTransform(codeBlock)) {
@@ -35,17 +33,20 @@ const CODE_SNIPPET = `async preprocessCode({ codeBlock, config }) {
 					});`;
 
 const COMMENT_SELECTION: [[[number, number], [number, number]]] = [
-  [[2, 0], [2, 68]],
+  [
+    [2, 0],
+    [2, 68],
+  ],
 ];
 
 const TOKEN_COLORS = {
-  default: '#a7a7a7',
-  keyword: '#6e6e6e',
-  functionName: '#7a7a7a',
-  variable: '#7a7a7a',
-  property: '#5c5c5c',
-  comment: '#333333',
-  punctuation: '#585151',
+  default: "#a7a7a7",
+  keyword: "#6e6e6e",
+  functionName: "#7a7a7a",
+  variable: "#7a7a7a",
+  property: "#5c5c5c",
+  comment: "#333333",
+  punctuation: "#585151",
 } as const;
 
 const TOKEN_PATTERNS = [
@@ -63,9 +64,9 @@ function createSceneHighlighter() {
       return true;
     },
     prepare(code: string) {
-      const spans: {start: number; end: number; color: string}[] = [];
+      const spans: { start: number; end: number; color: string }[] = [];
 
-      for (const {regex, color} of TOKEN_PATTERNS) {
+      for (const { regex, color } of TOKEN_PATTERNS) {
         for (const match of code.matchAll(regex)) {
           if (match.index === undefined) {
             continue;
@@ -74,21 +75,21 @@ function createSceneHighlighter() {
           const start = match.index;
           const end = start + match[0].length;
 
-          if (spans.some(span => !(end <= span.start || start >= span.end))) {
+          if (spans.some((span) => !(end <= span.start || start >= span.end))) {
             continue;
           }
 
-          spans.push({start, end, color});
+          spans.push({ start, end, color });
         }
       }
 
       spans.sort((left, right) => left.start - right.start);
       return spans;
     },
-    highlight(index: number, cache: {start: number; end: number; color: string}[]) {
-      const span = cache.find(candidate => index >= candidate.start && index < candidate.end);
+    highlight(index: number, cache: { start: number; end: number; color: string }[]) {
+      const span = cache.find((candidate) => index >= candidate.start && index < candidate.end);
       if (!span) {
-        return {color: TOKEN_COLORS.default, skipAhead: 1};
+        return { color: TOKEN_COLORS.default, skipAhead: 1 };
       }
 
       return {
@@ -103,7 +104,7 @@ function createSceneHighlighter() {
 }
 
 function normalizeHexColor(color: string) {
-  if (!color.startsWith('#')) {
+  if (!color.startsWith("#")) {
     return TOKEN_COLORS.default;
   }
 
@@ -127,8 +128,8 @@ function mixChannel(from: number, to: number, progress: number) {
 }
 
 function mixHex(from: string, to: string, progress: number) {
-  const fromClean = normalizeHexColor(from).replace('#', '');
-  const toClean = normalizeHexColor(to).replace('#', '');
+  const fromClean = normalizeHexColor(from).replace("#", "");
+  const toClean = normalizeHexColor(to).replace("#", "");
   const fromR = Number.parseInt(fromClean.slice(0, 2), 16);
   const fromG = Number.parseInt(fromClean.slice(2, 4), 16);
   const fromB = Number.parseInt(fromClean.slice(4, 6), 16);
@@ -136,18 +137,18 @@ function mixHex(from: string, to: string, progress: number) {
   const toG = Number.parseInt(toClean.slice(2, 4), 16);
   const toB = Number.parseInt(toClean.slice(4, 6), 16);
 
-  return `#${mixChannel(fromR, toR, progress).toString(16).padStart(2, '0')}${mixChannel(fromG, toG, progress).toString(16).padStart(2, '0')}${mixChannel(fromB, toB, progress).toString(16).padStart(2, '0')}`;
+  return `#${mixChannel(fromR, toR, progress).toString(16).padStart(2, "0")}${mixChannel(fromG, toG, progress).toString(16).padStart(2, "0")}${mixChannel(fromB, toB, progress).toString(16).padStart(2, "0")}`;
 }
 
 export default makeScene2D(function* (view) {
   view.fill(BASE.bg);
 
-  const codeRef   = createRef<Code>();
+  const codeRef = createRef<Code>();
   const selectionBgRef = createRef<Rect>();
-  const arrowRef  = createRef<Line>();
-  const tagRef    = createRef<PillLabel>();
-  const label1    = createRef<PillLabel>();
-  const label2    = createRef<PillLabel>();
+  const arrowRef = createRef<Line>();
+  const tagRef = createRef<PillLabel>();
+  const label1 = createRef<PillLabel>();
+  const label2 = createRef<PillLabel>();
   const blendProgress = createSignal(0);
   const highlighter = createSceneHighlighter();
 
@@ -155,14 +156,14 @@ export default makeScene2D(function* (view) {
     <>
       <Rect
         ref={selectionBgRef}
-        x={-270}
-        y={-66}
-        width={560}
+        x={-180}
+        y={-317}
+        width={510}
         height={24}
         radius={4}
-        fill="#94ecd287"
-        stroke="#efefef40"
-        lineWidth={0}
+        fill="#00000000"
+        stroke="#94ecd287"
+        lineWidth={1}
         opacity={0}
       />
 
@@ -170,9 +171,6 @@ export default makeScene2D(function* (view) {
         ref={codeRef}
         code={CODE_SNIPPET}
         highlighter={highlighter}
-        x={-540}
-        y={-92}
-        offset={[-1, -1]}
         fontSize={15}
         fontFamily={BASE.mono}
         selection={[]}
@@ -180,7 +178,7 @@ export default makeScene2D(function* (view) {
         scale={0.98}
         drawHooks={{
           token(ctx, text, position, color, selection) {
-            const blended = mixHex(color, '#3d3d3d', blendProgress());
+            const blended = mixHex(color, "#3d3d3d", blendProgress());
             const alpha = selection > 0 ? 1 : 0.45 + (1 - blendProgress()) * 0.25;
             ctx.fillStyle = blended;
             ctx.globalAlpha *= alpha;
@@ -192,7 +190,10 @@ export default makeScene2D(function* (view) {
       {/* Arrow pointing to comment line */}
       <Line
         ref={arrowRef}
-        points={[[220, -66], [72, -66]]}
+        points={[
+          [260, -320],
+          [104, -320],
+        ]}
         stroke={BASE.textMid}
         lineWidth={1.5}
         endArrow
@@ -206,13 +207,25 @@ export default makeScene2D(function* (view) {
         ref={tagRef}
         text="hard to read"
         accentColor={BASE.textMid}
-        x={320}
-        y={-66}
+        x={370}
+        y={-320}
         opacity={0}
       />
 
-      <PillLabel ref={label1} text="Everything started to look the same." accentColor={BASE.text} y={200} opacity={0} />
-      <PillLabel ref={label2} text="Which defeated the whole point." accentColor={BASE.text} y={245} opacity={0} />
+      <Layout layout direction="column" y={200}>
+        <PillLabel
+          ref={label1}
+          text="Everything started to look the same."
+          accentColor={BASE.text}
+          opacity={0}
+        />
+        <PillLabel
+          ref={label2}
+          text="Which defeated the whole point."
+          accentColor={BASE.text}
+          opacity={0}
+        />
+      </Layout>
     </>,
   );
 
@@ -249,9 +262,5 @@ export default makeScene2D(function* (view) {
   yield* label2().opacity(1, 0.5);
   yield* waitFor(1.2);
 
-  yield* all(
-    codeRef().opacity(0, 0.4),
-    label1().opacity(0, 0.4),
-    label2().opacity(0, 0.4),
-  );
+  yield* all(codeRef().opacity(0, 0.4), label1().opacity(0, 0.4), label2().opacity(0, 0.4));
 });

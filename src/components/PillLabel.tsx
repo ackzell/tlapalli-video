@@ -1,6 +1,6 @@
-import { Layout, Rect, Txt, Node, NodeProps, initial, signal } from '@motion-canvas/2d';
-import { SignalValue, SimpleSignal } from '@motion-canvas/core';
-import { BASE } from '../styles/palette';
+import { Layout, Rect, Txt, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
+import { SignalValue, SimpleSignal } from "@motion-canvas/core";
+import { BASE } from "../styles/palette";
 
 export interface PillLabelProps extends NodeProps {
   text?: SignalValue<string>;
@@ -15,35 +15,31 @@ export interface PillLabelProps extends NodeProps {
  *   yield* pill().opacity(1, 0.5);
  */
 export class PillLabel extends Node {
-  @initial('label')
+  @initial("label")
   @signal()
-  public declare readonly text: SimpleSignal<string, this>;
+  declare public readonly text: SimpleSignal<string, this>;
 
-  @initial('#5c5c5c')
+  @initial("#5c5c5c")
   @signal()
-  public declare readonly accentColor: SimpleSignal<string, this>;
+  declare public readonly accentColor: SimpleSignal<string, this>;
 
   public constructor(props?: PillLabelProps) {
-    super(props);
+    super(props ?? {});
 
     this.add(
       <Rect
         fill={BASE.surfaceHi}
-        stroke={() => this.accentColor()}
+        stroke={BASE.border}
         lineWidth={1}
         radius={7}
         paddingLeft={16}
         paddingRight={16}
         paddingTop={8}
         paddingBottom={8}
+        margin={10}
         layout
       >
-        <Txt
-          text={() => this.text()}
-          fontSize={13}
-          fill={BASE.textMid}
-          fontFamily={BASE.font}
-        />
+        <Txt text={() => this.text()} fontSize={26} fill={BASE.textMid} fontFamily={BASE.font} />
       </Rect>,
     );
   }

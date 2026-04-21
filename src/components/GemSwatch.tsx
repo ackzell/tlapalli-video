@@ -1,26 +1,31 @@
-import { Rect, Txt, Node, NodeProps, initial, signal } from '@motion-canvas/2d';
-import { SignalValue, SimpleSignal } from '@motion-canvas/core';
-import { BASE, GemMode, GemName, palette } from '../styles/palette';
-import { Gem } from './Gem';
+import { Rect, Txt, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
+import { SignalValue, SimpleSignal } from "@motion-canvas/core";
+import { BASE, GemMode, GemName, palette } from "../styles/palette";
+import { Gem } from "./Gem";
 
 export interface GemSwatchProps extends NodeProps {
   gem?: SignalValue<GemName>;
   mode?: SignalValue<GemMode>;
   gemName?: SignalValue<string>;
+  labelOpacity?: SignalValue<number>;
 }
 
 export class GemSwatch extends Node {
-  @initial('obsidian')
+  @initial("obsidian")
   @signal()
-  public declare readonly gem: SimpleSignal<GemName, this>;
+  declare public readonly gem: SimpleSignal<GemName, this>;
 
-  @initial('dark')
+  @initial("dark")
   @signal()
-  public declare readonly mode: SimpleSignal<GemMode, this>;
+  declare public readonly mode: SimpleSignal<GemMode, this>;
 
-  @initial('Gem')
+  @initial("Gem")
   @signal()
-  public declare readonly gemName: SimpleSignal<string, this>;
+  declare public readonly gemName: SimpleSignal<string, this>;
+
+  @initial(1)
+  @signal()
+  declare public readonly labelOpacity: SimpleSignal<number, this>;
 
   public constructor(props?: GemSwatchProps) {
     super(props ?? {});
@@ -41,17 +46,14 @@ export class GemSwatch extends Node {
         gap={10}
       >
         <Rect width={72} height={62} fill="#00000000" lineWidth={0}>
-          <Gem
-            gem={() => this.gem()}
-            mode={() => this.mode()}
-            size={31}
-          />
+          <Gem gem={() => this.gem()} mode={() => this.mode()} size={31} />
         </Rect>
         <Txt
           text={() => this.gemName()}
           fontSize={12}
           fill={() => palette[this.gem()][this.mode()].mid}
           fontFamily={BASE.mono}
+          opacity={() => this.labelOpacity()}
           textAlign="center"
           maxWidth={96}
           textWrap

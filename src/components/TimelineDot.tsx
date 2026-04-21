@@ -1,9 +1,10 @@
-import { Circle, Txt, Node, NodeProps, initial, signal } from '@motion-canvas/2d';
-import { SignalValue, SimpleSignal } from '@motion-canvas/core';
-import { BASE } from '../styles/palette';
+import { Circle, Txt, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
+import { SignalValue, SimpleSignal } from "@motion-canvas/core";
+import { BASE, GemName, palette } from "../styles/palette";
+import { Gem } from "./Gem";
 
 export interface TimelineDotProps extends NodeProps {
-  dotColor?: SignalValue<string>;
+  gemColor?: SignalValue<GemName>;
   label?: SignalValue<string>;
   labelBelow?: SignalValue<boolean>;
 }
@@ -13,39 +14,39 @@ export interface TimelineDotProps extends NodeProps {
  * Used in Scene 13 to mark points on the story timeline.
  *
  * Usage:
- *   <TimelineDot dotColor="#80684e" label="first tint" scale={0} />
+ *   <TimelineDot gemColor="jade" label="first tint" scale={0} />
  *   yield* dot().scale(1, 0.3, easeOutBack);
  */
 export class TimelineDot extends Node {
-  @initial('#5c5c5c')
+  @initial("jade")
   @signal()
-  public declare readonly dotColor: SimpleSignal<string, this>;
+  declare public readonly gemColor: SimpleSignal<GemName, this>;
 
-  @initial('event')
+  @initial("event")
   @signal()
-  public declare readonly label: SimpleSignal<string, this>;
+  declare public readonly label: SimpleSignal<string, this>;
 
   @initial(true)
   @signal()
-  public declare readonly labelBelow: SimpleSignal<boolean, this>;
+  declare public readonly labelBelow: SimpleSignal<boolean, this>;
 
   public constructor(props?: TimelineDotProps) {
-    super(props);
+    super(props ?? {});
 
     this.add(
       <>
-        <Circle
+        <Gem
+          gem={() => this.gemColor()}
           size={14}
-          fill={() => this.dotColor()}
-          shadowColor={() => this.dotColor()}
+          shadowColor={() => palette[this.gemColor()]["dark"].fg}
           shadowBlur={10}
         />
         <Txt
           text={() => this.label()}
           fontSize={11}
           fill={BASE.textMid}
-          fontFamily={BASE.font}
-          y={() => this.labelBelow() ? 22 : -22}
+          fontFamily={BASE.titleFont}
+          y={() => (this.labelBelow() ? 45 : -45)}
           textAlign="center"
         />
       </>,

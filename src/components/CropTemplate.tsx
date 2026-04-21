@@ -1,10 +1,18 @@
-import { Rect, Line, Node, NodeProps, initial, signal } from '@motion-canvas/2d';
-import { SignalValue, SimpleSignal, createRef, all, easeInOutCubic, waitFor } from '@motion-canvas/core';
+import { Rect, Line, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
+import {
+  SignalValue,
+  SimpleSignal,
+  createRef,
+  all,
+  easeInOutCubic,
+  waitFor,
+} from "@motion-canvas/core";
 
 export interface CropTemplateProps extends NodeProps {
   cropWidth?: SignalValue<number>;
   cropHeight?: SignalValue<number>;
   strokeColor?: SignalValue<string>;
+  fill?: SignalValue<string>;
 }
 
 /**
@@ -23,29 +31,32 @@ export interface CropTemplateProps extends NodeProps {
 export class CropTemplate extends Node {
   @initial(640)
   @signal()
-  public declare readonly cropWidth: SimpleSignal<number, this>;
+  declare public readonly cropWidth: SimpleSignal<number, this>;
 
   @initial(380)
   @signal()
-  public declare readonly cropHeight: SimpleSignal<number, this>;
+  declare public readonly cropHeight: SimpleSignal<number, this>;
 
-  @initial('#3d7f7d')
+  @initial("#3d7f7d")
   @signal()
-  public declare readonly strokeColor: SimpleSignal<string, this>;
+  declare public readonly strokeColor: SimpleSignal<string, this>;
+
+  @initial("#3d7f7d22")
+  @signal()
+  declare public readonly fill: SimpleSignal<string, this>;
 
   // The four sides, drawn independently for the staggered corner effect
-  private readonly topLine    = createRef<Line>();
-  private readonly rightLine  = createRef<Line>();
+  private readonly topLine = createRef<Line>();
+  private readonly rightLine = createRef<Line>();
   private readonly bottomLine = createRef<Line>();
-  private readonly leftLine   = createRef<Line>();
+  private readonly leftLine = createRef<Line>();
 
-  // The dim overlay — covers everything outside the crop region
-  private readonly dimOverlay = createRef<Rect>();
+  private readonly backgroundRef = createRef<Rect>();
 
   public constructor(props?: CropTemplateProps) {
-    super(props);
+    super(props ?? {});
 
-    const hw = () => this.cropWidth()  / 2;
+    const hw = () => this.cropWidth() / 2;
     const hh = () => this.cropHeight() / 2;
 
     this.add(
@@ -53,7 +64,10 @@ export class CropTemplate extends Node {
         {/* Top side */}
         <Line
           ref={this.topLine}
-          points={[[-hw(), -hh()], [hw(), -hh()]]}
+          points={[
+            [-hw(), -hh()],
+            [hw(), -hh()],
+          ]}
           stroke={() => this.strokeColor()}
           lineWidth={2}
           end={0}
@@ -62,7 +76,10 @@ export class CropTemplate extends Node {
         {/* Right side */}
         <Line
           ref={this.rightLine}
-          points={[[hw(), -hh()], [hw(), hh()]]}
+          points={[
+            [hw(), -hh()],
+            [hw(), hh()],
+          ]}
           stroke={() => this.strokeColor()}
           lineWidth={2}
           end={0}
@@ -71,7 +88,10 @@ export class CropTemplate extends Node {
         {/* Bottom side */}
         <Line
           ref={this.bottomLine}
-          points={[[hw(), hh()], [-hw(), hh()]]}
+          points={[
+            [hw(), hh()],
+            [-hw(), hh()],
+          ]}
           stroke={() => this.strokeColor()}
           lineWidth={2}
           end={0}
@@ -80,11 +100,23 @@ export class CropTemplate extends Node {
         {/* Left side */}
         <Line
           ref={this.leftLine}
-          points={[[-hw(), hh()], [-hw(), -hh()]]}
+          points={[
+            [-hw(), hh()],
+            [-hw(), -hh()],
+          ]}
           stroke={() => this.strokeColor()}
           lineWidth={2}
           end={0}
           lineCap="round"
+        />
+
+        <Rect
+          ref={this.backgroundRef}
+          width={this.cropWidth()}
+          height={this.cropHeight()}
+          fill={() => this.fill()}
+          opacity={0}
+          zIndex={-1}
         />
       </>,
     );
@@ -100,6 +132,7 @@ export class CropTemplate extends Node {
     yield* this.rightLine().end(1, sideDur, easeInOutCubic);
     yield* this.bottomLine().end(1, sideDur, easeInOutCubic);
     yield* this.leftLine().end(1, sideDur, easeInOutCubic);
+    yield* this.backgroundRef().opacity(1, 0.3);
   }
 
   /**
@@ -113,12 +146,15 @@ export class CropTemplate extends Node {
       this.rightLine().opacity(0, duration / 2),
       this.bottomLine().opacity(0, duration / 2),
       this.leftLine().opacity(0, duration / 2),
+      this.backgroundRef().opacity(0, duration / 2),
     );
     yield* all(
       this.topLine().opacity(1, duration / 2),
       this.rightLine().opacity(1, duration / 2),
       this.bottomLine().opacity(1, duration / 2),
       this.leftLine().opacity(1, duration / 2),
+      this.backgroundRef().opacity(1, duration / 2),
+      this.backgroundRef().opacity(1, duration / 2),
     );
   }
 
@@ -131,5 +167,6 @@ export class CropTemplate extends Node {
     this.rightLine().end(1);
     this.bottomLine().end(1);
     this.leftLine().end(1);
+    this.backgroundRef().opacity(0);
   }
 }

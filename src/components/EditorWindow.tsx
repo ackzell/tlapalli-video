@@ -1,6 +1,6 @@
-import {Rect, Txt, Node, NodeProps, initial, signal} from '@motion-canvas/2d';
-import {SignalValue, SimpleSignal, createRef, easeInOutCubic} from '@motion-canvas/core';
-import {BASE} from '../styles/palette';
+import { Rect, Txt, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
+import { SignalValue, SimpleSignal, createRef, easeInOutCubic } from "@motion-canvas/core";
+import { BASE } from "../styles/palette";
 
 export interface EditorWindowProps extends NodeProps {
   accentColor?: SignalValue<string>;
@@ -17,37 +17,37 @@ export interface EditorWindowProps extends NodeProps {
  * EditorWindow - a simplified VSCode-style window.
  */
 export class EditorWindow extends Node {
-  @initial('#5c5c5c')
+  @initial("#5c5c5c")
   @signal()
-  public declare readonly accentColor: SimpleSignal<string, this>;
+  declare public readonly accentColor: SimpleSignal<string, this>;
 
-  @initial('repo/')
+  @initial("repo/")
   @signal()
-  public declare readonly label: SimpleSignal<string, this>;
+  declare public readonly label: SimpleSignal<string, this>;
 
   @initial(480)
   @signal()
-  public declare readonly winWidth: SimpleSignal<number, this>;
+  declare public readonly winWidth: SimpleSignal<number, this>;
 
   @initial(300)
   @signal()
-  public declare readonly winHeight: SimpleSignal<number, this>;
+  declare public readonly winHeight: SimpleSignal<number, this>;
 
   @initial(true)
   @signal()
-  public declare readonly showPlaceholderContent: SimpleSignal<boolean, this>;
+  declare public readonly showPlaceholderContent: SimpleSignal<boolean, this>;
 
   @initial(BASE.surface)
   @signal()
-  public declare readonly bodyFill: SimpleSignal<string, this>;
+  declare public readonly bodyFill: SimpleSignal<string, this>;
 
   @initial(0.2)
   @signal()
-  public declare readonly placeholderBaseOpacity: SimpleSignal<number, this>;
+  declare public readonly placeholderBaseOpacity: SimpleSignal<number, this>;
 
   @initial(0)
   @signal()
-  public declare readonly extraPlaceholderLines: SimpleSignal<number, this>;
+  declare public readonly extraPlaceholderLines: SimpleSignal<number, this>;
 
   private readonly titleBarRef = createRef<Rect>();
   private readonly bodyRef = createRef<Rect>();
@@ -63,18 +63,22 @@ export class EditorWindow extends Node {
 
     this.add(
       <Rect
-        stroke={ this.accentColor()}
+        stroke={this.accentColor()}
         lineWidth={1}
-        width={() => this.winWidth()} height={totalHeight} radius={6} clip>
+        width={() => this.winWidth()}
+        height={totalHeight}
+        radius={6}
+        clip
+      >
         <Rect
           ref={this.titleBarRef}
           width={() => this.winWidth()}
           height={32}
           y={titleY}
-          fill="#00000000"
+          fill={this.bodyFill()}
           radius={[6, 6, 0, 0]}
           opacity={1}
-          
+          lineWidth={0}
         >
           <Rect width={10} height={10} radius={5} x={-this.winWidth() / 2 + 20} fill="#ffffff33" />
           <Rect width={10} height={10} radius={5} x={-this.winWidth() / 2 + 36} fill="#ffffff33" />
@@ -83,7 +87,7 @@ export class EditorWindow extends Node {
             ref={this.labelRef}
             text={() => this.label()}
             fontSize={11}
-            fill={ () => this.accentColor()}
+            fill={() => this.accentColor()}
             fontFamily={BASE.mono}
             x={-this.winWidth() / 2 + 120}
           />
@@ -94,13 +98,17 @@ export class EditorWindow extends Node {
           width={() => this.winWidth()}
           height={() => this.winHeight()}
           y={bodyY}
-          fill={() => this.bodyFill()}
+          fill={this.bodyFill()}
           radius={[0, 0, 6, 6]}
         />
 
         {this.showPlaceholderContent()
-          ? [...[0.4, 0.7, 0.3, 0.6, 0.5, 0.8, 0.35, 0.65],
-              ...Array.from({length: Math.max(0, this.extraPlaceholderLines())}, (_, i) => 0.24 + ((i * 19) % 54) / 100),
+          ? [
+              ...[0.4, 0.7, 0.3, 0.6, 0.5, 0.8, 0.35, 0.65],
+              ...Array.from(
+                { length: Math.max(0, this.extraPlaceholderLines()) },
+                (_, i) => 0.24 + ((i * 19) % 54) / 100,
+              ),
             ].map((w, i) => (
               <Rect
                 width={() => this.winWidth() * w * 0.7}

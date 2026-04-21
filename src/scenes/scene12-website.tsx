@@ -1,26 +1,42 @@
-import {makeScene2D, Rect, Img, Line, Txt} from '@motion-canvas/2d';
-import {
-  all, waitFor, createRef, easeInOutCubic, easeOutCubic,
-} from '@motion-canvas/core';
-import {BASE, palette} from '../styles/palette';
-import {PillLabel} from '../components/PillLabel';
+import { makeScene2D, Rect, Img, Line, Txt } from "@motion-canvas/2d";
+import { all, waitFor, createRef, easeInOutCubic, easeOutCubic } from "@motion-canvas/core";
+import { BASE, palette } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
 
-import websiteLanding from '../images/website/website-landing.png';
-import websiteFeatures from '../images/website/website-features.png';
-import websiteFooter from '../images/website/website-footer.png';
+import websiteLanding from "../images/website/website-landing.png";
+import websiteFeatures from "../images/website/website-features.png";
+import websiteFooter from "../images/website/website-footer.png";
 
-import frostedObsidian from '../images/website/frosted-obsidian.png';
-import frostedTurquoise from '../images/website/frosted-turquoise.png';
-import frostedGold from '../images/website/frosted-gold.png';
+import frostedObsidian from "../images/website/frosted-obsidian.png";
+import frostedTurquoise from "../images/website/frosted-turquoise.png";
+import frostedGold from "../images/website/frosted-gold.png";
 
-import frostedGemObsidian from '../images/website/frosted-gem-obsidian.png';
-import frostedGemTurquoise from '../images/website/frosted-gem-turquoise.png';
-import frostedGemGold from '../images/website/frosted-gem-gold.png';
+import frostedGemObsidian from "../images/website/frosted-gem-obsidian.png";
+import frostedGemTurquoise from "../images/website/frosted-gem-turquoise.png";
+import frostedGemGold from "../images/website/frosted-gem-gold.png";
 
 const CALLOUTS = [
-  {text: 'frosted glass header', color: palette.turquoise.dark.fg, x: 290, y: -122, lineEnd: [130, -96] as [number, number]},
-  {text: 'haptic on mobile', color: palette.amethyst.dark.fg, x: 305, y: 4, lineEnd: [155, 4] as [number, number]},
-  {text: 'gems are buttons', color: palette.gold.dark.fg, x: 285, y: -168, lineEnd: [92, -150] as [number, number]},
+  {
+    text: "frosted glass header",
+    color: palette.turquoise.dark.fg,
+    x: 290,
+    y: -122,
+    lineEnd: [130, -96] as [number, number],
+  },
+  {
+    text: "haptic on mobile",
+    color: palette.amethyst.dark.fg,
+    x: 305,
+    y: 4,
+    lineEnd: [155, 4] as [number, number],
+  },
+  {
+    text: "gems are buttons",
+    color: palette.gold.dark.fg,
+    x: 285,
+    y: -168,
+    lineEnd: [92, -150] as [number, number],
+  },
 ] as const;
 
 export default makeScene2D(function* (view) {
@@ -46,7 +62,7 @@ export default makeScene2D(function* (view) {
     <>
       <Rect
         ref={browserRef}
-        width={860}
+        width={960}
         height={472}
         radius={9}
         fill={BASE.surface}
@@ -62,9 +78,9 @@ export default makeScene2D(function* (view) {
           </Rect>
         </Rect>
 
-        <Img ref={landingRef} src={websiteLanding} height={430} y={15} opacity={0} />
-        <Img ref={featuresRef} src={websiteFeatures} height={430} y={15} opacity={0} />
-        <Img ref={footerRef} src={websiteFooter} height={430} y={15} opacity={0} />
+        <Img ref={landingRef} src={websiteLanding} height={620} y={15} opacity={0} />
+        <Img ref={featuresRef} src={websiteFeatures} height={620} y={15} opacity={0} />
+        <Img ref={footerRef} src={websiteFooter} height={620} y={15} opacity={0} />
       </Rect>
 
       {CALLOUTS.map((c, i) => (
@@ -90,9 +106,9 @@ export default makeScene2D(function* (view) {
 
       <Rect
         ref={frostedCardRef}
-        width={300}
-        height={176}
-        x={-302}
+        width={600}
+        height={276}
+        x={-502}
         radius={8}
         fill={BASE.surface}
         stroke={BASE.border}
@@ -100,16 +116,16 @@ export default makeScene2D(function* (view) {
         clip
         opacity={0}
       >
-        <Img ref={frostedRefs[0]} src={frostedObsidian} width={284} y={0} opacity={0} />
-        <Img ref={frostedRefs[1]} src={frostedTurquoise} width={284} y={0} opacity={0} />
-        <Img ref={frostedRefs[2]} src={frostedGold} width={284} y={0} opacity={0} />
+        <Img ref={frostedRefs[0]} src={frostedObsidian} width={584} y={0} opacity={0} />
+        <Img ref={frostedRefs[1]} src={frostedTurquoise} width={584} y={0} opacity={0} />
+        <Img ref={frostedRefs[2]} src={frostedGold} width={584} y={0} opacity={0} />
       </Rect>
 
       <Rect
         ref={frostedGemCardRef}
-        width={300}
-        height={176}
-        x={302}
+        width={600}
+        height={276}
+        x={352}
         radius={8}
         fill={BASE.surface}
         stroke={BASE.border}
@@ -117,11 +133,10 @@ export default makeScene2D(function* (view) {
         clip
         opacity={0}
       >
-        <Img ref={frostedGemRefs[0]} src={frostedGemObsidian} width={284} y={0} opacity={0} />
-        <Img ref={frostedGemRefs[1]} src={frostedGemTurquoise} width={284} y={0} opacity={0} />
-        <Img ref={frostedGemRefs[2]} src={frostedGemGold} width={284} y={0} opacity={0} />
+        <Img ref={frostedGemRefs[0]} src={frostedGemObsidian} width={584} y={0} opacity={0} />
+        <Img ref={frostedGemRefs[1]} src={frostedGemTurquoise} width={584} y={0} opacity={0} />
+        <Img ref={frostedGemRefs[2]} src={frostedGemGold} width={584} y={0} opacity={0} />
       </Rect>
-
     </>,
   );
 
@@ -133,19 +148,15 @@ export default makeScene2D(function* (view) {
   yield* waitFor(0.25);
 
   yield* all(
-    ...calloutRefs.map(({line, pill}) => all(
-      line().end(1, 0.35, easeInOutCubic),
-      pill().opacity(1, 0.35),
-    )),
+    ...calloutRefs.map(({ line, pill }) =>
+      all(line().end(1, 0.35, easeInOutCubic), pill().opacity(1, 0.35)),
+    ),
   );
 
   yield* waitFor(0.75);
 
   yield* all(
-    ...calloutRefs.map(({line, pill}) => all(
-      line().opacity(0, 0.25),
-      pill().opacity(0, 0.25),
-    )),
+    ...calloutRefs.map(({ line, pill }) => all(line().opacity(0, 0.25), pill().opacity(0, 0.25))),
   );
 
   yield* waitFor(0.35);
@@ -194,11 +205,11 @@ export default makeScene2D(function* (view) {
 
   yield* waitFor(0.85);
 
-//   yield* all(
-//     frostedCardRef().opacity(0, 0.35),
-//     frostedGemCardRef().opacity(0, 0.35),
-//   );
+  //   yield* all(
+  //     frostedCardRef().opacity(0, 0.35),
+  //     frostedGemCardRef().opacity(0, 0.35),
+  //   );
 
-yield* frostedCardRef().opacity(0, 0.35);
-yield* frostedGemCardRef().opacity(0, 0.35);
+  yield* frostedCardRef().opacity(0, 0.35);
+  yield* frostedGemCardRef().opacity(0, 0.35);
 });

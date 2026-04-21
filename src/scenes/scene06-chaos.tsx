@@ -1,9 +1,7 @@
-import { makeScene2D, Rect, Txt, Layout } from '@motion-canvas/2d';
-import {
-  all, waitFor, createRef, easeInOutCubic, sequence, easeOutCubic,
-} from '@motion-canvas/core';
-import { BASE, palette } from '../styles/palette';
-import { PillLabel } from '../components/PillLabel';
+import { makeScene2D, Rect, Txt, Layout } from "@motion-canvas/2d";
+import { all, waitFor, createRef, easeOutCubic, sequence } from "@motion-canvas/core";
+import { BASE, palette } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
 
 const JSON_ENTRIES = [
   '"editor.background": "#020202",',
@@ -24,15 +22,18 @@ export default makeScene2D(function* (view) {
   view.fill(BASE.bg);
 
   const panelConfigs = [
-    {x: 0, y: 0},
-    {x: -600, y: -200},
-    {x: 600, y: 200},
-    {x: 0, y: 0},
+    { x: 0, y: 0, speed: 1 },
+    { x: -600, y: -200, speed: 0.8 },
+    { x: 600, y: 200, speed: 1.2 },
+    { x: 0, y: 0, speed: 0.65 },
+    { x: -600, y: 200, speed: 0.9 },
+    { x: 600, y: -200, speed: 1.4 },
   ];
 
-  const containerRefs = panelConfigs.map(() => createRef<Layout>());
-  const entryRefs = panelConfigs.map(() => JSON_ENTRIES.map(() => createRef<Txt>()));
-  const closingRefs = panelConfigs.map(() => createRef<Txt>());
+  const entryContainers = panelConfigs.map(() => JSON_ENTRIES.map(() => createRef<Layout>()));
+  const entryTexts = panelConfigs.map(() => JSON_ENTRIES.map(() => createRef<Txt>()));
+  const closingContainers = panelConfigs.map(() => createRef<Layout>());
+  const closingTexts = panelConfigs.map(() => createRef<Txt>());
   const label = createRef<PillLabel>();
 
   view.add(
@@ -40,36 +41,52 @@ export default makeScene2D(function* (view) {
       {panelConfigs.map((panel, panelIndex) => (
         <Rect
           width={560}
-          height={360}
+          layout
           radius={8}
           x={panel.x}
           y={panel.y}
-          fill={BASE.surface}
-          stroke={BASE.border}
-          lineWidth={4}
+          fill={BASE.bg}
+          stroke={BASE.surfaceHi}
+          lineWidth={2}
           clip
         >
-          <Layout
-            layout
-            ref={containerRefs[panelIndex]}
-            direction="column"
-            gap={7}
-            padding={20}
-            alignItems="start"
-            y={10}
-          >
-            <Txt text='"workbench.colorCustomizations": {' fontSize={13} fill={BASE.textMid} fontFamily={BASE.font} />
+          <Layout layout direction="column" gap={7} padding={20}>
+            <Txt
+              text='"workbench.colorCustomizations": {'
+              fontSize={13}
+              fill={BASE.textMid}
+              fontFamily={BASE.mono}
+            />
+
             {JSON_ENTRIES.map((entry, entryIndex) => (
+              <Layout
+                layout
+                direction="column"
+                height={0}
+                clip
+                ref={entryContainers[panelIndex][entryIndex]}
+              >
+                <Txt
+                  ref={entryTexts[panelIndex][entryIndex]}
+                  text={`  ${entry}`}
+                  fontSize={12}
+                  fill={BASE.text}
+                  fontFamily={BASE.mono}
+                  opacity={0}
+                />
+              </Layout>
+            ))}
+
+            <Layout layout direction="column" height={0} clip ref={closingContainers[panelIndex]}>
               <Txt
-                ref={entryRefs[panelIndex][entryIndex]}
-                text={`  ${entry}`}
-                fontSize={12}
-                fill={BASE.text}
-                fontFamily={BASE.mono}
+                ref={closingTexts[panelIndex]}
+                text="}"
+                fontSize={13}
+                fill={BASE.textMid}
+                fontFamily={BASE.font}
                 opacity={0}
               />
-            ))}
-            <Txt ref={closingRefs[panelIndex]} text="}" fontSize={13} fill={BASE.textMid} fontFamily={BASE.font} opacity={0} />
+            </Layout>
           </Layout>
         </Rect>
       ))}
@@ -84,46 +101,36 @@ export default makeScene2D(function* (view) {
     </>,
   );
 
-  // Entries appear one by one — typewriter rhythm, building pressure
-  yield* sequence(
-    0.1,
-    ...entryRefs.flatMap((list, panelIndex) => [
-      ...list.map(ref => ref().opacity(1, 0.15)),
-      closingRefs[panelIndex]().opacity(1, 0.15),
-    ]),
-  );
-
-  yield* waitFor(0.3);
-
-  // The chaos: entries drift and overlap
   yield* all(
-    label().opacity(1, 0.4),
-    ...entryRefs.flatMap((list) =>
-      list.map((ref) => {
-        const drift = (Math.random() - 0.5) * 30;
-        const driftY = (Math.random() - 0.5) * 20;
-        return all(
-          ref().position.x(drift, 0.4, easeOutCubic),
-          ref().position.y(driftY, 0.4, easeOutCubic),
-          ref().opacity(0.4 + Math.random() * 0.3, 0.4),
-        );
-      }),
-    ),
-    ...closingRefs.map((ref) => {
-      const drift = (Math.random() - 0.5) * 24;
-      const driftY = (Math.random() - 0.5) * 16;
-      return all(
-        ref().position.x(drift, 0.4, easeOutCubic),
-        ref().position.y(driftY, 0.4, easeOutCubic),
-        ref().opacity(0.35 + Math.random() * 0.25, 0.4),
+    ...entryContainers.map((containers, panelIndex) => {
+      const speed = panelConfigs[panelIndex].speed;
+      const delayOffset = panelIndex * 0.2;
+
+      return sequence(
+        0.08 * speed,
+
+        ...containers.map((container, i) =>
+          all(
+            waitFor(delayOffset),
+            container().height("100%", 0.25 * speed, easeOutCubic),
+            entryTexts[panelIndex][i]().opacity(1, 0.15 * speed),
+          ),
+        ),
+
+        all(
+          waitFor(delayOffset),
+          closingContainers[panelIndex]().height("100%", 0.25 * speed, easeOutCubic),
+          closingTexts[panelIndex]().opacity(1, 0.15 * speed),
+        ),
       );
     }),
   );
 
+  yield* waitFor(0.4);
+
+  yield* all(label().opacity(1, 0.4));
+
   yield* waitFor(0.8);
 
-  yield* all(
-    ...containerRefs.map((ref) => ref().opacity(0, 0.4)),
-    label().opacity(0, 0.4),
-  );
+  yield* all(label().opacity(0, 0.4));
 });

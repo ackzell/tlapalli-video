@@ -1,21 +1,29 @@
-import { makeScene2D, Rect, Txt, Circle } from '@motion-canvas/2d';
+import { makeScene2D, Rect, Txt, Circle } from "@motion-canvas/2d";
 import {
-  all, waitFor, createRef, easeInOutCubic, loop, cancel, ThreadGenerator,
-  tween, map, easeOutCubic,
-} from '@motion-canvas/core';
-import { BASE, palette } from '../styles/palette';
-import { PillLabel } from '../components/PillLabel';
+  all,
+  waitFor,
+  createRef,
+  easeInOutCubic,
+  loop,
+  cancel,
+  ThreadGenerator,
+  tween,
+  map,
+  easeOutCubic,
+} from "@motion-canvas/core";
+import { BASE, palette } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
 
-const QUESTION = 'How hard would it be to build my own theme?';
+const QUESTION = "How hard would it be to build my own theme?";
 
 export default makeScene2D(function* (view) {
   // Subtle warm shift toward gold
   view.fill(palette.gold.dark.bg);
 
   const questionRef = createRef<Txt>();
-  const cursorRef   = createRef<Rect>();
+  const cursorRef = createRef<Rect>();
   const rabbitLabel = createRef<PillLabel>();
-  const holeRef     = createRef<Rect>();
+  const holeRef = createRef<Rect>();
 
   view.add(
     <>
@@ -39,15 +47,7 @@ export default makeScene2D(function* (view) {
       />
 
       {/* Rabbit hole — a dark oval */}
-      <Rect
-        ref={holeRef}
-        width={60}
-        height={16}
-        radius={8}
-        fill="#000000"
-        y={80}
-        opacity={0}
-      />
+      <Rect ref={holeRef} width={60} height={16} radius={8} fill="#000000" y={80} opacity={0} />
 
       <PillLabel
         ref={rabbitLabel}

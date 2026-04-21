@@ -1,6 +1,6 @@
-import { makeScene2D, Rect, Circle, Txt, Layout } from '@motion-canvas/2d';
-import { all, waitFor, createRef, easeInOutCubic, sequence } from '@motion-canvas/core';
-import { BASE, palette, GEM_ORDER, GEM_LABELS } from '../styles/palette';
+import { makeScene2D, Rect, Circle, Txt, Layout } from "@motion-canvas/2d";
+import { all, waitFor, createRef, easeInOutCubic, sequence } from "@motion-canvas/core";
+import { BASE, palette, GEM_ORDER, GEM_LABELS } from "../styles/palette";
 
 export default makeScene2D(function* (view) {
   view.fill(BASE.bg);
@@ -8,13 +8,13 @@ export default makeScene2D(function* (view) {
   // --- Gem positions: center gem (obsidian) + 7 surrounding ---
   // Hexagonal arrangement: 1 center + 6 ring + 1 top accent
   const gemData = [
-    { name: 'obsidian',    x:   0, y:   0 },
-    { name: 'gold',        x:  52, y: -30 },
-    { name: 'turquoise',   x:  52, y:  30 },
-    { name: 'quartz',      x:   0, y:  60 },
-    { name: 'lapisLazuli', x: -52, y:  30 },
-    { name: 'amethyst',    x: -52, y: -30 },
-    { name: 'jade',        x:   0, y: -60 },
+    { name: "obsidian", x: 0, y: 0 },
+    { name: "gold", x: 52, y: -30 },
+    { name: "turquoise", x: 52, y: 30 },
+    { name: "quartz", x: 0, y: 60 },
+    { name: "lapisLazuli", x: -52, y: 30 },
+    { name: "amethyst", x: -52, y: -30 },
+    { name: "jade", x: 0, y: -60 },
   ] as const;
 
   const gemRefs = gemData.map(() => createRef<Circle>());
@@ -65,10 +65,7 @@ export default makeScene2D(function* (view) {
   yield* sequence(
     0.12,
     ...gemRefs.map((ref, i) =>
-      all(
-        ref().opacity(1, 0.5, easeInOutCubic),
-        ref().shadowBlur(i === 0 ? 8 : 20, 0.5),
-      ),
+      all(ref().opacity(1, 0.5, easeInOutCubic), ref().shadowBlur(i === 0 ? 8 : 20, 0.5)),
     ),
   );
 

@@ -1,21 +1,27 @@
-import {makeScene2D, Circle, Img, Txt, Node} from '@motion-canvas/2d';
-import ayu from '../images/tutorialkit-dark-modern.png';
-import panda from '../images/amoxtli-dark-modern.png';
-import moonlight from '../images/ec-plugins-dark-modern.png';
+import { makeScene2D, Circle, Img, Txt, Node, Layout } from "@motion-canvas/2d";
+import ayu from "../images/tutorialkit-dark-modern.png";
+import panda from "../images/amoxtli-dark-modern.png";
+import moonlight from "../images/ec-plugins-dark-modern.png";
 
 import {
-  all, waitFor, createRef, easeInOutCubic, easeOutCubic, sequence, chain,
-} from '@motion-canvas/core';
-import {BASE, palette} from '../styles/palette';
-import {PillLabel} from '../components/PillLabel';
+  all,
+  waitFor,
+  createRef,
+  easeInOutCubic,
+  easeOutCubic,
+  sequence,
+  chain,
+} from "@motion-canvas/core";
+import { BASE, palette } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
 
 export default makeScene2D(function* (view) {
   view.fill(BASE.bg);
 
   const imageData = [
-    {src: ayu, x: -360, role: 'backend'},
-    {src: panda, x: 0, role: 'frontend'},
-    {src: moonlight, x: 360, role: 'lib'},
+    { src: ayu, x: -360, role: "backend" },
+    { src: panda, x: 0, role: "frontend" },
+    { src: moonlight, x: 360, role: "lib" },
   ];
   const baseImageOpacity = 0.4;
 
@@ -62,20 +68,20 @@ export default makeScene2D(function* (view) {
         zIndex={10}
       />
 
-      <PillLabel
-        ref={label1}
-        text="Context switching has a cost."
-        accentColor={palette.gold.dark.fg}
-        y={140}
-        opacity={0}
-      />
-      <PillLabel
-        ref={label2}
-        text="Not just time. Mental energy."
-        accentColor={palette.quartz.dark.fg}
-        y={185}
-        opacity={0}
-      />
+      <Layout layout direction={"column"} y={230}>
+        <PillLabel
+          ref={label1}
+          text="Context switching has a cost."
+          accentColor={palette.gold.dark.fg}
+          opacity={0}
+        />
+        <PillLabel
+          ref={label2}
+          text="Not just time. Mental energy."
+          accentColor={palette.quartz.dark.fg}
+          opacity={0}
+        />
+      </Layout>
     </>,
   );
 
@@ -118,13 +124,10 @@ export default makeScene2D(function* (view) {
   yield* label2().opacity(1, 0.5);
   yield* waitFor(1.2);
 
-  yield* all(
-    label1().opacity(0, 0.3),
-    label2().opacity(0, 0.3),
-  );
+  yield* all(label1().opacity(0, 0.3), label2().opacity(0, 0.3));
 
   yield* all(
-    ...imageRefs.map(r => r().opacity(0, 0.4)),
-    ...imageTitleRefs.map(r => r().opacity(0, 0.4)),
+    ...imageRefs.map((r) => r().opacity(0, 0.4)),
+    ...imageTitleRefs.map((r) => r().opacity(0, 0.4)),
   );
 });

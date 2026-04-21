@@ -1,29 +1,21 @@
-import { makeScene2D, Txt, Layout } from '@motion-canvas/2d';
-import {
-  all, waitFor, createRef, easeInOutCubic,
-} from '@motion-canvas/core';
-import { BASE, palette } from '../styles/palette';
-import { PillLabel } from '../components/PillLabel';
-import { TlapalliLogo } from '../components/TlapalliLogo';
+import { makeScene2D, Txt, Layout } from "@motion-canvas/2d";
+import { all, waitFor, createRef, easeInOutCubic, sequence } from "@motion-canvas/core";
+import { BASE, palette } from "../styles/palette";
+import { PillLabel } from "../components/PillLabel";
+import { TlapalliLogo } from "../components/TlapalliLogo";
 
 export default makeScene2D(function* (view) {
   view.fill(BASE.bg);
 
-  const logoRef   = createRef<TlapalliLogo>();
-  const titleRef  = createRef<Txt>();
-  const urlRef    = createRef<Txt>();
-  const cta1Ref   = createRef<PillLabel>();
-  const cta2Ref   = createRef<PillLabel>();
+  const logoRef = createRef<TlapalliLogo>();
+  const titleRef = createRef<Txt>();
+  const urlRef = createRef<Txt>();
+  const cta1Ref = createRef<PillLabel>();
+  const cta2Ref = createRef<PillLabel>();
 
   view.add(
     <>
-      <TlapalliLogo
-        ref={logoRef}
-        mode="dark"
-        gemSize={42}
-        y={-40}
-        opacity={0}
-      />
+      <TlapalliLogo ref={logoRef} mode="dark" gemSize={59} y={-70} opacity={0} />
 
       <Txt
         ref={titleRef}
@@ -69,9 +61,10 @@ export default makeScene2D(function* (view) {
   yield* titleRef().opacity(1, 0.6);
   yield* urlRef().opacity(1, 0.5);
 
-  yield* all(
-    cta1Ref().opacity(1, 0.4),
-    cta2Ref().opacity(1, 0.4),
+  yield* sequence(
+    0.45,
+    cta1Ref().opacity(1, 0.5, easeInOutCubic),
+    cta2Ref().opacity(1, 0.5, easeInOutCubic),
   );
 
   yield* waitFor(2);
