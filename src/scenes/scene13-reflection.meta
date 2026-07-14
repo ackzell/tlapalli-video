@@ -1,5 +1,22 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "inspiration",
+      "targetTime": 1.806426360570924
+    },
+    {
+      "name": "iteration",
+      "targetTime": 4.462620666633466
+    },
+    {
+      "name": "dots",
+      "targetTime": 22.989094890058627
+    },
+    {
+      "name": "outro",
+      "targetTime": 25.66891916148074
+    }
+  ],
   "seed": 2011329384
 }

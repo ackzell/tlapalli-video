@@ -1,5 +1,5 @@
 import { Rect, Txt, Node, NodeProps, initial, signal } from "@motion-canvas/2d";
-import { SignalValue, SimpleSignal } from "@motion-canvas/core";
+import { createSignal, SignalValue, SimpleSignal, TimingFunction } from "@motion-canvas/core";
 import { BASE, GemMode, GemName, palette } from "../styles/palette";
 import { Gem } from "./Gem";
 
@@ -15,7 +15,7 @@ export class GemSwatch extends Node {
   @signal()
   declare public readonly gem: SimpleSignal<GemName, this>;
 
-  @initial("dark")
+  @initial(0)
   @signal()
   declare public readonly mode: SimpleSignal<GemMode, this>;
 
@@ -50,8 +50,8 @@ export class GemSwatch extends Node {
         </Rect>
         <Txt
           text={() => this.gemName()}
-          fontSize={12}
-          fill={() => palette[this.gem()][this.mode()].mid}
+          fontSize={20}
+          fill={() => palette[this.gem()][this.mode() === 1 ? "light" : "dark"].mid}
           fontFamily={BASE.mono}
           opacity={() => this.labelOpacity()}
           textAlign="center"

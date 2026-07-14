@@ -1,33 +1,23 @@
 import { makeScene2D, Rect, Node, Layout } from "@motion-canvas/2d";
-import { all, waitFor, createRef, easeInOutCubic, sequence } from "@motion-canvas/core";
+import {
+  all,
+  waitFor,
+  createRef,
+  easeInOutCubic,
+  sequence,
+  waitUntil,
+  useDuration,
+} from "@motion-canvas/core";
 import { BASE } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
 import { EditorWindow } from "../components/EditorWindow";
+import { FixedCamera } from "../components/FixedCamera";
+import { addGroovyBackground } from "../lib/background";
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const windowConfigs = [
-    // {
-    //   x: -530,
-    //   y: 0,
-    //   scale: 1,
-    //   zIndex: 2,
-    //   winW: 430,
-    //   winH: 280,
-    //   label: 'backend',
-    //   accent: BASE.text,
-    //   tokens: [
-    //     { color: '#4ec9b0', w: 0.34 },
-    //     { color: '#569cd6', w: 0.16 },
-    //     { color: '#ce9178', w: 0.26 },
-    //     { color: '#9cdcfe', w: 0.43 },
-    //     { color: '#6a9955', w: 0.38 },
-    //     { color: '#dcdcaa', w: 0.19 },
-    //     { color: '#c586c0', w: 0.14 },
-    //     { color: '#9cdcfe', w: 0.48 },
-    //   ],
-    // },
     {
       x: 0,
       y: -8,
@@ -37,38 +27,62 @@ export default makeScene2D(function* (view) {
       winH: 280,
       label: "frontend",
       accent: BASE.text,
+      bodyFill: "#18101c",
       tokens: [
-        { color: "#569cd6", w: 0.18 },
-        { color: "#9cdcfe", w: 0.32 },
-        { color: "#ce9178", w: 0.28 },
-        { color: "#6a9955", w: 0.42 },
-        { color: "#dcdcaa", w: 0.22 },
-        { color: "#4ec9b0", w: 0.35 },
-        { color: "#c586c0", w: 0.14 },
+        { color: "#9cdcfe", w: 0.56 },
+        { color: "#6a9955", w: 0.44 },
+        { color: "#569cd6", w: 0.24 },
+        { color: "#ce9178", w: 0.29 },
+        { color: "#c586c0", w: 0.2 },
+        { color: "#dcdcaa", w: 0.64 },
+        { color: "#4ec9b0", w: 0.27 },
         { color: "#9cdcfe", w: 0.38 },
-        { color: "#569cd6", w: 0.12 },
-        { color: "#6a9955", w: 0.55 },
+        { color: "#6a9955", w: 0.19 },
       ],
     },
-    // {
-    //   x: 546,
-    //   y: 0,
-    //   scale: 1,
-    //   zIndex: 1,
-    //   winW: 430,
-    //   winH: 280,
-    //   label: 'library',
-    //   accent: BASE.text,
-    //   tokens: [
-    //     { color: '#c586c0', w: 0.2 },
-    //     { color: '#6a9955', w: 0.44 },
-    //     { color: '#569cd6', w: 0.12 },
-    //     { color: '#9cdcfe', w: 0.36 },
-    //     { color: '#dcdcaa', w: 0.24 },
-    //     { color: '#ce9178', w: 0.29 },
-    //     { color: '#4ec9b0', w: 0.17 },
-    //   ],
-    // },
+
+    {
+      x: -530,
+      y: 0,
+      scale: 0.65,
+      zIndex: 2,
+      winW: 430,
+      winH: 280,
+      label: "backend",
+      accent: BASE.text,
+      bodyFill: "#10171c",
+      tokens: [
+        { color: "#4ec9b0", w: 0.34 },
+        { color: "#569cd6", w: 0.16 },
+        { color: "#ce9178", w: 0.26 },
+        { color: "#9cdcfe", w: 0.43 },
+        { color: "#6a9955", w: 0.38 },
+        { color: "#dcdcaa", w: 0.19 },
+        { color: "#c586c0", w: 0.14 },
+        { color: "#9cdcfe", w: 0.48 },
+      ],
+    },
+
+    {
+      x: 546,
+      y: 0,
+      scale: 0.65,
+      zIndex: 1,
+      winW: 430,
+      winH: 280,
+      label: "library",
+      accent: BASE.text,
+      bodyFill: "#2d2d2d",
+      tokens: [
+        { color: "#c586c0", w: 0.2 },
+        { color: "#6a9955", w: 0.44 },
+        { color: "#569cd6", w: 0.12 },
+        { color: "#9cdcfe", w: 0.36 },
+        { color: "#dcdcaa", w: 0.24 },
+        { color: "#ce9178", w: 0.29 },
+        { color: "#4ec9b0", w: 0.17 },
+      ],
+    },
   ];
 
   const winRefs = windowConfigs.map(() => createRef<EditorWindow>());
@@ -93,53 +107,58 @@ export default makeScene2D(function* (view) {
   const LINE_H = 8;
   const LINE_GAP = 9;
 
+  const cameraRef = createRef<FixedCamera>();
+
   view.add(
-    <>
-      {windowConfigs.map((cfg, wi) => {
-        const linesTop = -cfg.winH / 2 + TITLE_H + 52;
-        return (
-          <Node>
-            <EditorWindow
-              ref={winRefs[wi]}
-              accentColor={cfg.accent}
-              label={cfg.label}
-              winWidth={cfg.winW}
-              winHeight={cfg.winH}
-              showPlaceholderContent={false}
-              x={cfg.x}
-              y={cfg.y}
-              opacity={0}
-              scale={cfg.scale * 0.94}
-              zIndex={cfg.zIndex}
-            />
-
-            {cfg.tokens.map(({ color, w }, li) => (
-              <Rect
-                ref={tokenRefs[wi][li]}
-                width={cfg.winW * w * cfg.scale}
-                height={Math.max(5, LINE_H * cfg.scale)}
-                radius={2}
-                fill={color}
+    <FixedCamera ref={cameraRef} zoom={2.5}>
+      <Node>
+        {windowConfigs.map((cfg, wi) => {
+          const linesTop = -cfg.winH / 2 + TITLE_H + 52;
+          return (
+            <Node>
+              <EditorWindow
+                ref={winRefs[wi]}
+                accentColor={cfg.accent}
+                label={cfg.label}
+                winWidth={cfg.winW}
+                winHeight={cfg.winH}
+                showPlaceholderContent={false}
+                x={cfg.x}
+                y={cfg.y}
                 opacity={0}
-                x={
-                  cfg.x -
-                  (cfg.winW * cfg.scale) / 2 +
-                  36 * cfg.scale +
-                  (cfg.winW * w * cfg.scale) / 2
-                }
-                y={cfg.y + linesTop * cfg.scale + li * (LINE_H + LINE_GAP) * cfg.scale}
-                zIndex={cfg.zIndex + 1}
+                scale={cfg.scale * 0.94}
+                zIndex={cfg.zIndex}
+                bodyFill={cfg.bodyFill}
               />
-            ))}
-          </Node>
-        );
-      })}
 
-      <Layout layout direction={"column"} y={230}>
-        <PillLabel ref={label1} text="Less noise." accentColor={BASE.textMid} opacity={0} />
-        <PillLabel ref={label2} text="More clarity." accentColor={BASE.textMid} opacity={0} />{" "}
-      </Layout>
-    </>,
+              {cfg.tokens.map(({ color, w }, li) => (
+                <Rect
+                  ref={tokenRefs[wi][li]}
+                  width={cfg.winW * w * cfg.scale}
+                  height={Math.max(5, LINE_H * cfg.scale)}
+                  radius={2}
+                  fill={color}
+                  opacity={0}
+                  x={
+                    cfg.x -
+                    (cfg.winW * cfg.scale) / 2 +
+                    36 * cfg.scale +
+                    (cfg.winW * w * cfg.scale) / 2
+                  }
+                  y={cfg.y + linesTop * cfg.scale + li * (LINE_H + LINE_GAP) * cfg.scale}
+                  zIndex={cfg.zIndex + 1}
+                />
+              ))}
+            </Node>
+          );
+        })}
+
+        <Layout layout direction={"column"} y={290}>
+          <PillLabel ref={label1} text="Better focus." accentColor={BASE.textMid} opacity={0} />
+          <PillLabel ref={label2} text="Less loaded." accentColor={BASE.textMid} opacity={0} />
+        </Layout>
+      </Node>
+    </FixedCamera>,
   );
 
   // Intro: window and colorful tokens settle in.
@@ -155,30 +174,55 @@ export default makeScene2D(function* (view) {
     ),
   );
 
-  yield* waitFor(0.35);
+  const monochromeDur = useDuration("monochrome");
+  yield* waitUntil("came-across");
 
-  // Colors drain simultaneously to the obsidian foreground grey
-  yield* all(
-    ...winRefs.map((ref, i) =>
-      ref().accentColor(drainedGreys[(i * 2) % drainedGreys.length], 1.4, easeInOutCubic),
-    ),
-    ...tokenRefs.flatMap((list, wi) =>
-      list.map((ref, li) =>
-        all(
-          ref().fill(drainedGreys[(li + wi * 2) % drainedGreys.length], 1.4, easeInOutCubic),
-          ref().opacity(0.58 + ((li + wi) % 3) * 0.09, 1.4, easeInOutCubic),
-        ),
+  // drain the colors for the first window (frontend) only
+  yield* sequence(
+    0.2,
+    ...tokenRefs[0].map((ref, li) =>
+      all(
+        ref().fill(drainedGreys[li % drainedGreys.length], 0.4, easeInOutCubic),
+        ref().opacity(0.58 + (li % 3) * 0.09, 0.4, easeInOutCubic),
       ),
     ),
   );
 
-  // Hold the stillness
-  yield* waitFor(1.5);
+  yield* winRefs[0]().bodyFill(BASE.bg, 0.5, easeInOutCubic);
 
+  yield* cameraRef().zoom(1, monochromeDur, easeInOutCubic);
+
+  yield* waitUntil("better-focus");
   yield* label1().opacity(1, 0.5);
-  yield* waitFor(0.3);
+
+  yield* waitUntil("less-loaded");
   yield* label2().opacity(1, 0.5);
   yield* waitFor(1.2);
+
+  yield* waitUntil("winter-time");
+  yield* view.fill("#02020299", 2, easeInOutCubic);
+
+  yield* waitUntil("color-drained");
+
+  yield* sequence(
+    0.2,
+    ...winRefs.splice(1).map((ref) => ref().bodyFill(BASE.bg, 1, easeInOutCubic)),
+  );
+
+  // Colors drain simultaneously to the obsidian foreground grey
+  yield* sequence(
+    0.2,
+    ...tokenRefs
+      .splice(1)
+      .flatMap((list, wi) =>
+        list.map((ref, li) =>
+          all(
+            ref().fill(drainedGreys[(li + wi * 2) % drainedGreys.length], 0.4, easeInOutCubic),
+            ref().opacity(0.58 + ((li + wi) % 3) * 0.09, 0.4, easeInOutCubic),
+          ),
+        ),
+      ),
+  );
 
   // Outro: token traces drift out in a stagger while chrome fades continuously.
   yield* all(
@@ -195,6 +239,7 @@ export default makeScene2D(function* (view) {
             ref().opacity(0, 0.32, easeInOutCubic),
           ),
         ),
+      view.fill("#00000000", 2, easeInOutCubic),
     ),
   );
 });

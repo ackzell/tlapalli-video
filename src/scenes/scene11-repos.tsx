@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line, Circle, Path } from "@motion-canvas/2d";
+import { makeScene2D, Rect, Txt, Line, Circle, Path, Layout, Node, Img } from "@motion-canvas/2d";
 import {
   all,
   waitFor,
@@ -8,30 +8,42 @@ import {
   sequence,
   loop,
   cancel,
+  waitUntil,
+  easeInElastic,
+  easeOutElastic,
 } from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
+import motionCanvasLogo from "../images/motion-canvas-logo-dark.svg";
+import { addGroovyBackground } from "../lib/background";
 
 const REPOS = [
   {
     label: "tlapalli-vscode-theme",
-    color: palette.obsidian.dark.mid,
-    labelColor: palette.obsidian.dark.mid,
-    x: -320,
+    color: palette.lapisLazuli.dark.mid,
+    labelColor: palette.lapisLazuli.dark.mid,
+    x: -465,
     kind: "theme" as const,
   },
   {
     label: "tlapalli-website",
     color: palette.turquoise.dark.fg,
     labelColor: palette.turquoise.dark.mid,
-    x: 0,
+    x: -155,
     kind: "web" as const,
   },
   {
     label: "tlapalli-screenshots",
     color: palette.gold.dark.fg,
     labelColor: palette.gold.dark.mid,
-    x: 320,
+    x: 155,
     kind: "scripts" as const,
+  },
+  {
+    label: "tlapalli-video",
+    color: palette.amethyst.dark.fg,
+    labelColor: palette.amethyst.dark.mid,
+    kind: "video" as const,
+    x: 465,
   },
 ] as const;
 
@@ -46,28 +58,17 @@ const GITHUB_VIEWBOX_SIZE = 16;
 const GITHUB_SCALE = 1.8;
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const boxRefs = REPOS.map(() => createRef<Rect>());
   const line1Ref = createRef<Line>();
   const line2Ref = createRef<Line>();
-  const titleRef = createRef<Txt>();
   const actionsBadgeRef = createRef<Rect>();
   const actionsLabelRef = createRef<Txt>();
   const actionsIconRef = createRef<Path>();
 
   view.add(
     <>
-      <Txt
-        ref={titleRef}
-        text="scripts, automation, a logo, a website"
-        fontSize={14}
-        fill={BASE.text}
-        fontFamily={BASE.font}
-        y={-220}
-        opacity={0}
-      />
-
       {/* Connecting lines */}
       <Line
         ref={line1Ref}
@@ -99,13 +100,13 @@ export default makeScene2D(function* (view) {
       {/* GitHub Actions automation cue */}
       <Rect
         ref={actionsBadgeRef}
-        width={190}
-        height={44}
+        width={290}
+        height={74}
         radius={10}
         fill={BASE.surfaceHi}
         stroke={palette.obsidian.dark.mid}
         lineWidth={1}
-        y={128}
+        y={158}
         opacity={0}
         scale={0.92}
         zIndex={9}
@@ -124,7 +125,7 @@ export default makeScene2D(function* (view) {
         <Txt
           ref={actionsLabelRef}
           text="GitHub Actions"
-          fontSize={11}
+          fontSize={20}
           fill={BASE.textMid}
           fontFamily={BASE.font}
           x={16}
@@ -244,9 +245,24 @@ export default makeScene2D(function* (view) {
             </>
           )}
 
+          {repo.kind === "video" && (
+            <Rect
+              width={54}
+              height={54}
+              radius={10}
+              y={-18}
+              fill={BASE.bg}
+              stroke={repo.color}
+              lineWidth={0}
+              opacity={0.85}
+            >
+              <Img src={motionCanvasLogo} />
+            </Rect>
+          )}
+
           <Txt
             text={repo.label}
-            fontSize={12}
+            fontSize={20}
             fill={repo.labelColor}
             fontFamily={BASE.font}
             y={36}
@@ -259,19 +275,38 @@ export default makeScene2D(function* (view) {
     </>,
   );
 
-  yield* titleRef().opacity(1, 0.5);
-
-  // Boxes scale in one by one
   yield* sequence(
-    0.15,
+    0.2,
     ...boxRefs.map((ref) =>
-      all(ref().opacity(1, 0.35, easeOutCubic), ref().scale(1, 0.4, easeOutCubic)),
+      all(ref().opacity(1, 0.35, easeOutCubic), ref().scale(1, 0.5, easeOutElastic)),
     ),
   );
 
-  // Lines draw between them
-  yield* all(line1Ref().end(1, 0.4, easeInOutCubic), line2Ref().end(1, 0.4, easeInOutCubic));
+  yield* waitUntil("theme-repository");
+  yield* all(
+    boxRefs[0]().scale(1.2, 0.4, easeOutCubic),
+    boxRefs[0]().scale(1.2, 0.4, easeOutCubic),
+  );
 
+  yield* waitUntil("website-repository");
+  yield* all(
+    boxRefs[1]().scale(1.2, 0.4, easeOutCubic),
+    boxRefs[1]().scale(1.2, 0.4, easeOutCubic),
+  );
+
+  yield* waitUntil("screenshots-repository");
+  yield* all(
+    boxRefs[2]().scale(1.2, 0.4, easeOutCubic),
+    boxRefs[2]().scale(1.2, 0.4, easeOutCubic),
+  );
+
+  yield* waitUntil("video-repository");
+  yield* all(
+    boxRefs[3]().scale(1.2, 0.4, easeOutCubic),
+    boxRefs[3]().scale(1.2, 0.4, easeOutCubic),
+  );
+
+  yield* waitUntil("github-action");
   yield* all(
     actionsBadgeRef().opacity(1, 0.35, easeOutCubic),
     actionsBadgeRef().scale(1, 0.35, easeOutCubic),
@@ -279,20 +314,30 @@ export default makeScene2D(function* (view) {
     actionsLabelRef().opacity(1, 0.3),
   );
 
-  // Lines pulse gently
-  const pulseTask = yield loop(Infinity, function* () {
-    yield* all(line1Ref().opacity(0.55, 1), line2Ref().opacity(0.55, 1));
-    yield* all(line1Ref().opacity(1, 1), line2Ref().opacity(1, 1));
-  });
+  // Lines draw between them
+  // yield* all(line1Ref().end(1, 0.4, easeInOutCubic), line2Ref().end(1, 0.4, easeInOutCubic));
 
-  yield* waitFor(2.4);
-  cancel(pulseTask);
+  // // Lines pulse gently
+  // const pulseTask = yield loop(Infinity, function* () {
+  //   yield* all(line1Ref().opacity(0.55, 1), line2Ref().opacity(0.55, 1));
+  //   yield* all(line1Ref().opacity(1, 1), line2Ref().opacity(1, 1));
+  // });
 
+  // yield* waitFor(2.4);
+  // cancel(pulseTask);
+
+  // yield* all(
+  //   ...boxRefs.map((r) => r().opacity(0, 0.4)),
+  //   line1Ref().opacity(0, 0.4),
+  //   line2Ref().opacity(0, 0.4),
+  //   actionsBadgeRef().opacity(0, 0.35),
+  // );
+
+  yield* waitUntil("repositories-out");
   yield* all(
     ...boxRefs.map((r) => r().opacity(0, 0.4)),
     line1Ref().opacity(0, 0.4),
     line2Ref().opacity(0, 0.4),
     actionsBadgeRef().opacity(0, 0.35),
-    titleRef().opacity(0, 0.35),
   );
 });

@@ -1,7 +1,15 @@
-import { makeScene2D, Code, Line, Rect, Layout } from "@motion-canvas/2d";
-import { all, waitFor, createRef, createSignal, easeInOutCubic } from "@motion-canvas/core";
+import { makeScene2D, Code, Line, Rect, Layout, Txt } from "@motion-canvas/2d";
+import {
+  all,
+  waitFor,
+  createRef,
+  createSignal,
+  easeInOutCubic,
+  waitUntil,
+} from "@motion-canvas/core";
 import { BASE } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
+import { addGroovyBackground } from "../lib/background";
 
 const CODE_SNIPPET = `async preprocessCode({ codeBlock, config }) {
 				if (shouldTransform(codeBlock)) {
@@ -141,16 +149,19 @@ function mixHex(from: string, to: string, progress: number) {
 }
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const codeRef = createRef<Code>();
   const selectionBgRef = createRef<Rect>();
   const arrowRef = createRef<Line>();
   const tagRef = createRef<PillLabel>();
+  const tagRef2 = createRef<PillLabel>();
   const label1 = createRef<PillLabel>();
   const label2 = createRef<PillLabel>();
   const blendProgress = createSignal(0);
   const highlighter = createSceneHighlighter();
+
+  const dramatizationRef = createRef<Txt>();
 
   view.add(
     <>
@@ -212,6 +223,15 @@ export default makeScene2D(function* (view) {
         opacity={0}
       />
 
+      <PillLabel
+        ref={tagRef2}
+        text="keywords looked too similar"
+        accentColor={BASE.textMid}
+        x={370}
+        y={-220}
+        opacity={0}
+      />
+
       <Layout layout direction="column" y={200}>
         <PillLabel
           ref={label1}
@@ -226,6 +246,15 @@ export default makeScene2D(function* (view) {
           opacity={0}
         />
       </Layout>
+
+      <Txt
+        ref={dramatizationRef}
+        text={"**Dramatization. This is not the actual theme."}
+        y={300}
+        fontSize={20}
+        fill="#ffffff33"
+        opacity={0}
+      />
     </>,
   );
 
@@ -238,6 +267,10 @@ export default makeScene2D(function* (view) {
 
   yield* waitFor(0.2);
 
+  yield* dramatizationRef().opacity(1, 0.5, easeInOutCubic);
+
+  yield* waitUntil("hard-to-read");
+
   // Arrow draws in toward the selected comment line.
   yield* all(
     codeRef().selection(COMMENT_SELECTION, 0.45, easeInOutCubic),
@@ -245,20 +278,25 @@ export default makeScene2D(function* (view) {
     arrowRef().end(1, 0.5, easeInOutCubic),
     tagRef().opacity(1, 0.4),
   );
-  yield* waitFor(0.5);
 
-  // Everything blends — token contrast collapses toward one flat grey mass.
+  yield* waitUntil("keywords");
+
+  yield* tagRef2().opacity(1, 0.4);
+
+  yield* waitUntil("everything-same");
+
   yield* all(
     codeRef().selection([], 0.4, easeInOutCubic),
     blendProgress(1, 1.2, easeInOutCubic),
     selectionBgRef().opacity(0, 0.35),
     arrowRef().opacity(0, 0.5),
     tagRef().opacity(0, 0.4),
+    tagRef2().opacity(0, 0.4),
+    dramatizationRef().opacity(0, 0.5, easeInOutCubic),
   );
 
-  yield* waitFor(0.5);
   yield* label1().opacity(1, 0.5);
-  yield* waitFor(0.2);
+  yield* waitUntil("defeated-point");
   yield* label2().opacity(1, 0.5);
   yield* waitFor(1.2);
 

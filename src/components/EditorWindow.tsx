@@ -41,7 +41,7 @@ export class EditorWindow extends Node {
   @signal()
   declare public readonly bodyFill: SimpleSignal<string, this>;
 
-  @initial(0.2)
+  @initial(1)
   @signal()
   declare public readonly placeholderBaseOpacity: SimpleSignal<number, this>;
 
@@ -63,8 +63,8 @@ export class EditorWindow extends Node {
 
     this.add(
       <Rect
-        stroke={this.accentColor()}
-        lineWidth={1}
+        stroke={BASE.surfaceHi}
+        lineWidth={2}
         width={() => this.winWidth()}
         height={totalHeight}
         radius={6}
@@ -75,7 +75,7 @@ export class EditorWindow extends Node {
           width={() => this.winWidth()}
           height={32}
           y={titleY}
-          fill={this.bodyFill()}
+          fill={() => this.bodyFill()}
           radius={[6, 6, 0, 0]}
           opacity={1}
           lineWidth={0}
@@ -98,7 +98,7 @@ export class EditorWindow extends Node {
           width={() => this.winWidth()}
           height={() => this.winHeight()}
           y={bodyY}
-          fill={this.bodyFill()}
+          fill={() => this.bodyFill()}
           radius={[0, 0, 6, 6]}
         />
 
@@ -115,7 +115,7 @@ export class EditorWindow extends Node {
                 height={8}
                 radius={2}
                 fill={() => this.accentColor()}
-                opacity={() => this.placeholderBaseOpacity() + i * 0.02}
+                opacity={() => this.placeholderBaseOpacity()}
                 x={() => -this.winWidth() / 2 + 40 + (this.winWidth() * w * 0.7) / 2}
                 y={() => bodyTop() + 20 + i * 14}
               />

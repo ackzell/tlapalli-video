@@ -1,5 +1,30 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "theme-repository",
+      "targetTime": 3.233257564524718
+    },
+    {
+      "name": "website-repository",
+      "targetTime": 9.009391228775524
+    },
+    {
+      "name": "screenshots-repository",
+      "targetTime": 10.388260516149783
+    },
+    {
+      "name": "video-repository",
+      "targetTime": 14.28271273541745
+    },
+    {
+      "name": "github-action",
+      "targetTime": 17.04779972366666
+    },
+    {
+      "name": "repositories-out",
+      "targetTime": 22.828122911242293
+    }
+  ],
   "seed": 795630700
 }

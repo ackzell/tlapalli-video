@@ -1,5 +1,22 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "website-explainer",
+      "targetTime": 7.257966590010873
+    },
+    {
+      "name": "website-intro",
+      "targetTime": 0
+    },
+    {
+      "name": "frosted-glass",
+      "targetTime": 8.528244829733096
+    },
+    {
+      "name": "website-out",
+      "targetTime": 23.172957207210413
+    }
+  ],
   "seed": 1974980484
 }

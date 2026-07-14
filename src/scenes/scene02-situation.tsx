@@ -10,26 +10,30 @@ import {
   easeInOutCubic,
   easeOutCubic,
   sequence,
-  chain,
+  waitUntil,
+  useDuration,
 } from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
+import { addGroovyBackground } from "../lib/background";
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const imageData = [
     { src: ayu, x: -360, role: "backend" },
     { src: panda, x: 0, role: "frontend" },
     { src: moonlight, x: 360, role: "lib" },
   ];
-  const baseImageOpacity = 0.4;
+  const baseImageOpacity = 0.55;
 
   const imageRefs = imageData.map(() => createRef<Img>());
   const imageTitleRefs = imageData.map(() => createRef<Txt>());
   const cursorRef = createRef<Circle>();
   const label1 = createRef<PillLabel>();
   const label2 = createRef<PillLabel>();
+
+  // view.fill(BASE.border);
 
   view.add(
     <>
@@ -39,7 +43,6 @@ export default makeScene2D(function* (view) {
             ref={imageRefs[i]}
             src={img.src}
             width={320}
-            radius={10}
             x={img.x}
             y={-20}
             opacity={0}
@@ -50,7 +53,7 @@ export default makeScene2D(function* (view) {
             text={img.role}
             x={img.x}
             y={-145}
-            fontSize={11}
+            fontSize={25}
             fill={BASE.textMid}
             fontFamily={BASE.titleFont}
             opacity={0}
@@ -71,13 +74,13 @@ export default makeScene2D(function* (view) {
       <Layout layout direction={"column"} y={230}>
         <PillLabel
           ref={label1}
-          text="Context switching has a cost."
+          text="Switching context has a cost."
           accentColor={palette.gold.dark.fg}
           opacity={0}
         />
         <PillLabel
           ref={label2}
-          text="Not just time. Mental energy."
+          text="Not just in time. In mental energy."
           accentColor={palette.quartz.dark.fg}
           opacity={0}
         />
@@ -86,41 +89,59 @@ export default makeScene2D(function* (view) {
   );
 
   yield* sequence(
-    0.15,
+    1.5,
     ...imageRefs.map((ref, idx) =>
-      all(
-        ref().opacity(baseImageOpacity, 0.5, easeOutCubic),
-        ref().scale(1, 0.5, easeOutCubic),
-        imageTitleRefs[idx]().opacity(0.85, 0.5, easeOutCubic),
-      ),
+      all(ref().opacity(baseImageOpacity, 0.5, easeOutCubic), ref().scale(1, 0.5, easeOutCubic)),
     ),
   );
 
+  yield* waitUntil("backend");
+  yield* imageTitleRefs[0]().opacity(1, 0.5, easeOutCubic);
+  yield* imageRefs[0]().opacity(1, 0.3);
+
+  yield* waitUntil("frontend");
+  yield* imageTitleRefs[1]().opacity(1, 0.5, easeOutCubic);
+  yield* imageRefs[1]().opacity(1, 0.3);
+
+  yield* waitUntil("lib");
+  yield* imageTitleRefs[2]().opacity(1, 0.5, easeOutCubic);
+  yield* imageRefs[2]().opacity(1, 0.3);
+
   yield* waitFor(0.3);
+
+  yield* all(...imageRefs.map((ref) => ref().opacity(baseImageOpacity, 0.5, easeInOutCubic)));
+
+  yield* waitUntil("one-thing-i-learned");
   yield* cursorRef().opacity(1, 0.3);
 
+  const differentContextsDuration = useDuration("different-contexts");
   const hoverOrder = [0, 1, 2, 0, 2];
+
+  const stepDuration = differentContextsDuration / hoverOrder.length;
+
   for (const targetIndex of hoverOrder) {
     const targetX = imageData[targetIndex].x;
 
-    yield* cursorRef().position.x(targetX, 0.3, easeInOutCubic);
     yield* all(
+      cursorRef().position.x(targetX, stepDuration, easeInOutCubic),
       ...imageRefs.map((ref, idx) =>
-        ref().opacity(idx === targetIndex ? 1 : baseImageOpacity, 0.16, easeInOutCubic),
+        ref().opacity(
+          idx === targetIndex ? 1 : baseImageOpacity,
+          stepDuration * 0.5,
+          easeInOutCubic,
+        ),
       ),
     );
-    yield* chain(
-      cursorRef().position.x(targetX + 6, 0.05),
-      cursorRef().position.x(targetX - 6, 0.05),
-      cursorRef().position.x(targetX, 0.05),
-    );
-    yield* waitFor(0.2);
   }
 
-  yield* cursorRef().opacity(0, 0.2);
+  yield* waitUntil("context-switch");
 
+  yield* cursorRef().opacity(0, 0.2);
+  yield* all(...imageRefs.map((ref) => ref().opacity(1, 0.4)));
   yield* label1().opacity(1, 0.5);
-  yield* waitFor(0.2);
+
+  yield* waitUntil("mental-energy");
+
   yield* label2().opacity(1, 0.5);
   yield* waitFor(1.2);
 

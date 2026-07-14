@@ -1,9 +1,10 @@
 import { makeScene2D, Rect, Circle, Txt, Layout } from "@motion-canvas/2d";
 import { all, waitFor, createRef, easeInOutCubic, sequence } from "@motion-canvas/core";
 import { BASE, palette, GEM_ORDER, GEM_LABELS } from "../styles/palette";
+import { addGroovyBackground } from "../lib/background";
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   // --- Gem positions: center gem (obsidian) + 7 surrounding ---
   // Hexagonal arrangement: 1 center + 6 ring + 1 top accent

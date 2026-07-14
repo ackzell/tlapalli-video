@@ -1,5 +1,22 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "variations",
+      "targetTime": 1.2453560809589215
+    },
+    {
+      "name": "variations-duration",
+      "targetTime": 12.162428255786239
+    },
+    {
+      "name": "one-tint",
+      "targetTime": 12.862366484411954
+    },
+    {
+      "name": "it-wasnt",
+      "targetTime": 19.20313657772385
+    }
+  ],
   "seed": 582411604
 }

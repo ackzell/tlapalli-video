@@ -38,8 +38,10 @@ export class PillLabel extends Node {
         paddingBottom={8}
         margin={10}
         layout
+        justifyContent={"center"}
+        alignItems={"center"}
       >
-        <Txt text={() => this.text()} fontSize={26} fill={BASE.textMid} fontFamily={BASE.font} />
+        <Txt text={() => this.text()} fontSize={46} fill={BASE.textMid} fontFamily={BASE.font} />
       </Rect>,
     );
   }

@@ -1,5 +1,14 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "screenshot-intro",
+      "targetTime": 5.120740077232988
+    },
+    {
+      "name": "show-crop",
+      "targetTime": 14.634537635644861
+    }
+  ],
   "seed": 1505591737
 }

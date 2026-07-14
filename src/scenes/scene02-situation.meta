@@ -1,5 +1,34 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "backend",
+      "targetTime": 6.057788329026252
+    },
+    {
+      "name": "frontend",
+      "targetTime": 7.08740366048478
+    },
+    {
+      "name": "lib",
+      "targetTime": 8.296588466924279
+    },
+    {
+      "name": "one-thing-i-learned",
+      "targetTime": 11.257075345012924
+    },
+    {
+      "name": "different-contexts",
+      "targetTime": 15.887219924512475
+    },
+    {
+      "name": "context-switch",
+      "targetTime": 20.098353943181124
+    },
+    {
+      "name": "mental-energy",
+      "targetTime": 26.311464349431787
+    }
+  ],
   "seed": 336715025
 }

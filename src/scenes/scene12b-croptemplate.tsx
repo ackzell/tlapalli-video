@@ -1,5 +1,13 @@
 import { makeScene2D, Rect, Img } from "@motion-canvas/2d";
-import { all, waitFor, createRef, easeInOutCubic, easeOutCubic } from "@motion-canvas/core";
+import {
+  all,
+  waitFor,
+  createRef,
+  easeInOutCubic,
+  easeOutCubic,
+  waitUntil,
+  useDuration,
+} from "@motion-canvas/core";
 import { BASE, palette, GEM_ORDER } from "../styles/palette";
 import { CropTemplate } from "../components/CropTemplate";
 import { PillLabel } from "../components/PillLabel";
@@ -21,6 +29,7 @@ import jadeDark from "../images/screenshots/jadeDark.png";
 import jadeLight from "../images/screenshots/jadeLight.png";
 import fireOpalDark from "../images/screenshots/fireOpalDark.png";
 import fireOpalLight from "../images/screenshots/fireOpalLight.png";
+import { addGroovyBackground } from "../lib/background";
 
 const SCREENSHOTS: Record<string, string> = {
   obsidianDark,
@@ -51,7 +60,7 @@ const CROP_X = -225.5;
 const CROP_Y = -34;
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   // --- BEAT 1: Show raw screenshot ---
   const fwRef = createRef<Img>();
@@ -96,11 +105,15 @@ export default makeScene2D(function* (view) {
     </>,
   );
 
+  const scaleDuration = useDuration("screenshot-intro");
+
   yield* fwRef().scale(1.05, 0);
-  yield* fwRef().scale(1, 0.5, easeOutCubic);
+  yield* fwRef().scale(1, scaleDuration, easeOutCubic);
   yield* rawLabel().opacity(1, 0.4);
   yield* waitFor(0.8);
   yield* rawLabel().opacity(0, 0.3);
+
+  yield* waitUntil("show-crop");
 
   // --- BEAT 2: SVG rectangle draws itself ---
   const tmpl = createRef<CropTemplate>();

@@ -1,5 +1,22 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "hard-to-read",
+      "targetTime": 3.3007211774831453
+    },
+    {
+      "name": "keywords",
+      "targetTime": 6.874350116205077
+    },
+    {
+      "name": "everything-same",
+      "targetTime": 11.157057421353695
+    },
+    {
+      "name": "defeated-point",
+      "targetTime": 15.709103217201127
+    }
+  ],
   "seed": 1703336896
 }

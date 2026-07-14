@@ -149,7 +149,7 @@ export const palette = {
 } as const;
 
 export type GemName = keyof typeof palette;
-export type GemMode = "dark" | "light";
+export type GemMode = 0 | 1; // 0 = dark, 1 = light
 
 // Ordered list used for sequential reveal animations
 export const GEM_ORDER: GemName[] = [
@@ -177,7 +177,7 @@ export const GEM_LABELS: Record<GemName, string> = {
 
 // Base values used across all scenes
 export const BASE = {
-  bg: "#020202", // global background
+  bg: palette.obsidian.dark.widgetBg, // global background
   text: "#5c5c5c", // default body text
   textMid: "#a7a7a7", // accent / highlight text
   surface: "#0d0d0d", // widget surfaces

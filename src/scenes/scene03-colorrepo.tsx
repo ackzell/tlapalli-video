@@ -1,4 +1,4 @@
-import { makeScene2D, Txt, Line, Img, Node } from "@motion-canvas/2d";
+import { makeScene2D, Txt, Line, Img, Node, Layout, Camera } from "@motion-canvas/2d";
 import {
   all,
   waitFor,
@@ -6,6 +6,8 @@ import {
   easeInOutCubic,
   easeOutCubic,
   sequence,
+  waitUntil,
+  useDuration,
 } from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
@@ -17,9 +19,11 @@ import ecPluginsDark from "../images/ec-plugins-dark-modern.png";
 import tutorialkitAyu from "../images/tutorialkit-ayu.png";
 import amoxtliPanda from "../images/amoxtli-panda.png";
 import ecPluginsMoonlight from "../images/ec-plugins-moonlight.png";
+import { FixedCamera } from "../components/FixedCamera";
+import { addGroovyBackground } from "../lib/background";
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const beforeImages = [
     { src: tutorialkitDark, name: "backend" },
@@ -38,7 +42,6 @@ export default makeScene2D(function* (view) {
   const afterLabelRefs = afterImages.map(() => createRef<Txt>());
 
   const imgWidth = 200;
-  const xs = [-270, 0, 270];
   const baseImageOpacity = 1;
 
   const divider = createRef<Line>();
@@ -46,91 +49,97 @@ export default makeScene2D(function* (view) {
   const afterLabel = createRef<Txt>();
   const pill = createRef<PillLabel>();
 
+  const afterNodeRef = createRef<Node>();
+  const cameraRef = createRef<Camera>();
+
+  // view.fill(BASE.border);
+
   view.add(
-    <>
-      {/* BEFORE images — left half */}
-      {beforeImages.map((img, i) => (
-        <Node key={`before-${img.name}-${i}`} x={-490 + xs[i]}>
-          <Txt
-            ref={beforeLabelRefs[i]}
-            text={img.name}
-            y={-105}
-            fontSize={16}
-            fill={BASE.text}
-            fontFamily={BASE.font}
-            opacity={0}
-          />
-          <Img ref={beforeRefs[i]} src={img.src} width={imgWidth} radius={8} opacity={0} />
-        </Node>
-      ))}
+    <FixedCamera ref={cameraRef}>
+      <Node cache={false}>
+        {/* BEFORE images — left half */}
+        <Layout layout gap={20} x={-450}>
+          {beforeImages.map((img, i) => (
+            <Layout key={`before-${img.name}-${i}`} layout direction={"column"} gap={10}>
+              <Txt
+                ref={beforeLabelRefs[i]}
+                text={img.name}
+                fontSize={16}
+                fill={BASE.text}
+                fontFamily={BASE.titleFont}
+                opacity={0}
+              />
+              <Img ref={beforeRefs[i]} src={img.src} width={imgWidth} alpha={0} />
+            </Layout>
+          ))}
+        </Layout>
 
-      {/* AFTER images — right half */}
-      {afterImages.map((img, i) => (
-        <Node key={`after-${img.name}-${i}`} x={490 + xs[i]}>
-          <Txt
-            ref={afterLabelRefs[i]}
-            text={img.name}
-            y={-105}
-            fontSize={16}
-            fill={BASE.textMid}
-            fontFamily={BASE.font}
-            opacity={0}
-          />
-          <Img ref={afterRefs[i]} src={img.src} width={imgWidth} radius={8} opacity={0} />
-        </Node>
-      ))}
+        {/* Vertical divider */}
+        <Line
+          ref={divider}
+          points={[
+            [0, -220],
+            [0, 220],
+          ]}
+          stroke={BASE.text}
+          opacity={0.15}
+          lineWidth={2}
+          end={0}
+        />
 
-      {/* Vertical divider */}
-      <Line
-        ref={divider}
-        points={[
-          [0, -220],
-          [0, 220],
-        ]}
-        stroke={BASE.border}
-        lineWidth={1}
-        end={0}
-      />
+        {/* AFTER images — right half */}
+        <Layout layout gap={20} x={450} ref={afterNodeRef}>
+          {afterImages.map((img, i) => (
+            <Layout key={`after-${img.name}-${i}`} direction={"column"} gap={10}>
+              <Txt
+                ref={afterLabelRefs[i]}
+                text={img.name}
+                fontSize={16}
+                fill={BASE.text}
+                fontFamily={BASE.titleFont}
+                opacity={0}
+              />
+              <Img ref={afterRefs[i]} src={img.src} width={imgWidth} alpha={0} />
+            </Layout>
+          ))}
+        </Layout>
 
-      <Txt
-        ref={beforeLabel}
-        text="before"
-        fontSize={12}
-        fill={BASE.text}
-        fontFamily={BASE.font}
-        x={-490}
-        y={-180}
-        opacity={0}
-      />
-      <Txt
-        ref={afterLabel}
-        text="after"
-        fontSize={12}
-        fill={BASE.textMid}
-        fontFamily={BASE.font}
-        x={490}
-        y={-180}
-        opacity={0}
-      />
+        <PillLabel ref={pill} text="One theme. One repo." opacity={0} x={450} y={150} scale={0.5} />
 
-      <PillLabel
-        ref={pill}
-        text="One color. One repo. One context."
-        accentColor={palette.turquoise.dark.fg}
-        y={180}
-        opacity={0}
-      />
-    </>,
+        <Txt
+          ref={beforeLabel}
+          text="before"
+          fontSize={20}
+          fill={BASE.text}
+          fontFamily={BASE.font}
+          x={-450}
+          y={-180}
+          opacity={0}
+        />
+        <Txt
+          ref={afterLabel}
+          text="after"
+          fontSize={20}
+          fill={BASE.text}
+          fontFamily={BASE.font}
+          x={450}
+          y={-180}
+          opacity={0}
+        />
+      </Node>
+    </FixedCamera>,
   );
 
   // Before side appears
   yield* sequence(
     0.1,
     ...beforeRefs.map((r, i) =>
-      all(r().opacity(baseImageOpacity, 0.4), beforeLabelRefs[i]().opacity(0.85, 0.4)),
+      all(r().alpha(baseImageOpacity, 0.4), beforeLabelRefs[i]().opacity(0.85, 0.4)),
     ),
   );
   yield* beforeLabel().opacity(1, 0.3);
+
+  yield* waitUntil("something-simple");
 
   // Divider draws
   yield* divider().end(1, 0.4, easeInOutCubic);
@@ -138,17 +147,25 @@ export default makeScene2D(function* (view) {
   // After side appears — themed
   yield* sequence(
     0.1,
-    ...afterRefs.map((r, i) => all(r().opacity(1, 0.4), afterLabelRefs[i]().opacity(0.85, 0.4))),
+    ...afterRefs.map((r, i) => all(r().alpha(1, 0.4), afterLabelRefs[i]().opacity(0.85, 0.4))),
   );
   yield* afterLabel().opacity(1, 0.3);
 
-  yield* waitFor(0.5);
+  yield* waitUntil("different-vscode-themes");
+  const differentThemesDur = useDuration("themes");
+
+  yield* all(
+    cameraRef().centerOn(afterNodeRef(), differentThemesDur, easeOutCubic),
+    cameraRef().zoom(2.5, differentThemesDur, easeOutCubic),
+  );
+
+  yield* waitUntil("one-theme-one-repo");
   yield* pill().opacity(1, 0.5);
   yield* waitFor(1.5);
 
   yield* all(
-    ...beforeRefs.map((r) => r().opacity(0, 0.4)),
-    ...afterRefs.map((r) => r().opacity(0, 0.4)),
+    ...beforeRefs.map((r) => r().alpha(0, 0.4)),
+    ...afterRefs.map((r) => r().alpha(0, 0.4)),
     ...beforeLabelRefs.map((r) => r().opacity(0, 0.4)),
     ...afterLabelRefs.map((r) => r().opacity(0, 0.4)),
     divider().opacity(0, 0.4),

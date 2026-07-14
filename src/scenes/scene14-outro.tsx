@@ -1,11 +1,12 @@
 import { makeScene2D, Txt, Layout } from "@motion-canvas/2d";
-import { all, waitFor, createRef, easeInOutCubic, sequence } from "@motion-canvas/core";
+import { all, waitFor, createRef, easeInOutCubic, sequence, waitUntil } from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
 import { TlapalliLogo } from "../components/TlapalliLogo";
+import { addGroovyBackground } from "../lib/background";
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const logoRef = createRef<TlapalliLogo>();
   const titleRef = createRef<Txt>();
@@ -15,30 +16,30 @@ export default makeScene2D(function* (view) {
 
   view.add(
     <>
-      <TlapalliLogo ref={logoRef} mode="dark" gemSize={59} y={-70} opacity={0} />
+      <TlapalliLogo ref={logoRef} gemSize={102} y={-120} opacity={0} mode={0} />
 
       <Txt
         ref={titleRef}
         text="Tlapalli"
-        fontSize={42}
+        fontSize={52}
         fill={BASE.textMid}
         fontFamily={BASE.titleFont}
         fontWeight={300}
-        y={60}
+        y={80}
         opacity={0}
       />
 
       <Txt
         ref={urlRef}
         text="tlapalli.ackzell.dev"
-        fontSize={16}
+        fontSize={36}
         fill={BASE.text}
         fontFamily={BASE.mono}
-        y={110}
+        y={150}
         opacity={0}
       />
 
-      <Layout layout y={165} gap={16}>
+      <Layout layout y={265} gap={16}>
         <PillLabel
           ref={cta1Ref}
           text="VSCode Marketplace"
@@ -61,13 +62,13 @@ export default makeScene2D(function* (view) {
   yield* titleRef().opacity(1, 0.6);
   yield* urlRef().opacity(1, 0.5);
 
-  yield* sequence(
-    0.45,
-    cta1Ref().opacity(1, 0.5, easeInOutCubic),
-    cta2Ref().opacity(1, 0.5, easeInOutCubic),
-  );
+  yield* waitUntil("vscode-marketplace");
+  yield* cta1Ref().opacity(1, 0.5, easeInOutCubic);
 
-  yield* waitFor(2);
+  yield* waitUntil("open-vsx");
+  yield* cta2Ref().opacity(1, 0.5, easeInOutCubic);
+
+  yield* waitUntil("outro");
 
   // Fade out — pills and URL first, then logo
   yield* all(

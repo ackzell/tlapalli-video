@@ -1,5 +1,26 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "question-mark",
+      "targetTime": 1.6588221244694896
+    },
+    {
+      "name": "one-question",
+      "targetTime": 11.873237478786322
+    },
+    {
+      "name": "question-start",
+      "targetTime": 12.587931771515143
+    },
+    {
+      "name": "question-typing",
+      "targetTime": 16.493841002639385
+    },
+    {
+      "name": "rabbit-hole",
+      "targetTime": 18.84384100263939
+    }
+  ],
   "seed": 2982731614
 }

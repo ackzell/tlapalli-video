@@ -1,5 +1,78 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "chat-1",
+      "targetTime": 1.2
+    },
+    {
+      "name": "chat-1-typing",
+      "targetTime": 1.9854116348222024
+    },
+    {
+      "name": "chat-2",
+      "targetTime": 2.5026185407621835
+    },
+    {
+      "name": "chat-2-typing",
+      "targetTime": 3.362618540762184
+    },
+    {
+      "name": "chat-3",
+      "targetTime": 4.049560552425937
+    },
+    {
+      "name": "chat-3-typing",
+      "targetTime": 4.7595605524259375
+    },
+    {
+      "name": "chat-4",
+      "targetTime": 5.36472665155244
+    },
+    {
+      "name": "chat-4-typing",
+      "targetTime": 6.224726651552441
+    },
+    {
+      "name": "chat-5",
+      "targetTime": 6.552726651552441
+    },
+    {
+      "name": "chat-5-typing",
+      "targetTime": 7.262726651552442
+    },
+    {
+      "name": "chat-6",
+      "targetTime": 7.518726651552442
+    },
+    {
+      "name": "chat-6-typing",
+      "targetTime": 8.378726651552443
+    },
+    {
+      "name": "chat-7",
+      "targetTime": 13.165336112468673
+    },
+    {
+      "name": "chat-7-typing",
+      "targetTime": 19.00260124848032
+    },
+    {
+      "name": "chat-8",
+      "targetTime": 19.874333694864664
+    },
+    {
+      "name": "chat-8-typing",
+      "targetTime": 21.681580485202925
+    },
+    {
+      "name": "a-single-hue",
+      "targetTime": 21.647484247377776
+    },
+    {
+      "name": "chat-outro",
+      "targetTime": 25.667297005953944
+    }
+  ],
   "seed": 2321650047
 }

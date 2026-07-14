@@ -1,5 +1,5 @@
 import { Node, NodeProps, Path, initial, signal } from "@motion-canvas/2d";
-import { SignalValue, SimpleSignal } from "@motion-canvas/core";
+import { Color, SignalValue, SimpleSignal } from "@motion-canvas/core";
 import { GemMode, GemName, palette } from "../styles/palette";
 
 export interface GemProps extends NodeProps {
@@ -127,13 +127,23 @@ export class Gem extends Node {
   @signal()
   declare public readonly gem: SimpleSignal<GemName, this>;
 
-  @initial("dark")
+  @initial(0)
   @signal()
   declare public readonly mode: SimpleSignal<GemMode, this>;
 
   @initial(30)
   @signal()
   declare public readonly size: SimpleSignal<number, this>;
+
+  // helper used by the paths below
+  private lerp(key: keyof (typeof palette)[GemName]["dark"]) {
+    return () => {
+      const t = this.mode();
+      const a = new Color(palette[this.gem()]["dark"][key]);
+      const b = new Color(palette[this.gem()]["light"][key]);
+      return Color.lerp(a, b, t).serialize();
+    };
+  }
 
   public constructor(props?: GemProps) {
     super(props ?? {});
@@ -146,15 +156,15 @@ export class Gem extends Node {
           layout={false}
           data={() => GEM_PATHS[this.gem()].outer}
           scale={scale}
-          fill={() => palette[this.gem()][this.mode()].bg}
-          stroke={() => palette[this.gem()][this.mode()].fg}
+          fill={this.lerp("bg")}
+          stroke={this.lerp("fg")}
           lineWidth={() => Math.max(1, this.size() * 0.07)}
         />
         <Path
           layout={false}
           data={() => GEM_PATHS[this.gem()].highlight}
           scale={scale}
-          fill={() => palette[this.gem()][this.mode()].fg}
+          fill={this.lerp("fg")}
           lineWidth={0}
           opacity={0.95}
         />
@@ -162,7 +172,7 @@ export class Gem extends Node {
           layout={false}
           data={() => GEM_PATHS[this.gem()].facet}
           scale={scale}
-          fill={() => palette[this.gem()][this.mode()].mid}
+          fill={this.lerp("mid")}
           lineWidth={0}
           opacity={0.92}
         />

@@ -1,5 +1,18 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "vscode-marketplace",
+      "targetTime": 7.871915765733824
+    },
+    {
+      "name": "open-vsx",
+      "targetTime": 10.498860727661404
+    },
+    {
+      "name": "outro",
+      "targetTime": 14.450396661654421
+    }
+  ],
   "seed": 2609476869
 }

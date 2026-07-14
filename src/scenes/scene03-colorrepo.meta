@@ -1,5 +1,22 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "something-simple",
+      "targetTime": 1.3702917650644508
+    },
+    {
+      "name": "different-vscode-themes",
+      "targetTime": 3.2884467148441727
+    },
+    {
+      "name": "themes",
+      "targetTime": 14.52706613469757
+    },
+    {
+      "name": "one-theme-one-repo",
+      "targetTime": 15.496047850580617
+    }
+  ],
   "seed": 3476409654
 }

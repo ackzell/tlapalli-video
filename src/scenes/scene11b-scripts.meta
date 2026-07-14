@@ -1,0 +1,50 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "along-side",
+      "targetTime": 1.0187361421587209
+    },
+    {
+      "name": "terminal-cmd",
+      "targetTime": 2.7199744515665865
+    },
+    {
+      "name": "terminal-cmd-typing",
+      "targetTime": 4.9723410876282585
+    },
+    {
+      "name": "terminal-output",
+      "targetTime": 6.280730048486934
+    },
+    {
+      "name": "terminal-2",
+      "targetTime": 7.2613786390410215
+    },
+    {
+      "name": "terminal-2-typing",
+      "targetTime": 8.082958585458272
+    },
+    {
+      "name": "terminal-2-output",
+      "targetTime": 8.803002557114509
+    },
+    {
+      "name": "terminal-3",
+      "targetTime": 9.788571791296539
+    },
+    {
+      "name": "terminal-3-typing",
+      "targetTime": 10.508409798035963
+    },
+    {
+      "name": "terminal-3-output",
+      "targetTime": 12.21203669698475
+    },
+    {
+      "name": "end-of-terminals",
+      "targetTime": 14.874174912423545
+    }
+  ],
+  "seed": 3849290534
+}

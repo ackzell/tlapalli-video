@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Layout, Line } from "@motion-canvas/2d";
+import { makeScene2D, Rect, Txt, Layout, Node } from "@motion-canvas/2d";
 import {
   all,
   waitFor,
@@ -7,27 +7,40 @@ import {
   easeOutCubic,
   sequence,
   useRandom,
+  useDuration,
+  waitUntil,
+  loop,
+  chain,
+  easeInBack,
+  easeOutBounce,
 } from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
+import { EditorWindow } from "../components/EditorWindow";
+import { floatIt } from "../lib/floatIt";
+import { addGroovyBackground } from "../lib/background";
 
 const CHAT_LINES = [
-  { role: "user", text: "Can you generate a yellow variant?" },
-  { role: "assistant", text: "Sure — here is a yellow variant..." },
-  { role: "user", text: "This is too bright, I want more muted colors." },
-  { role: "assistant", text: "All right, here is a less bright version." },
-  { role: "user", text: "What about a script that inverts the theme?" },
-  { role: "assistant", text: "Here is a script that inverts the theme colors." },
+  { role: "user", text: "Can you make the comments a little brighter?", cue: "chat-1" },
+  { role: "assistant", text: "Sure — here is a new color for comments...", cue: "chat-2" },
+  { role: "user", text: "This is too bright, comments should be more muted.", cue: "chat-3" },
+  { role: "assistant", text: "All right, here is a less bright version.", cue: "chat-4" },
+  { role: "user", text: "I want to customize the brackets", cue: "chat-5" },
+  {
+    role: "assistant",
+    text: "Here is a progressive set of colors for brackets.... ",
+    cue: "chat-6",
+  },
+  {
+    role: "user",
+    text: "Wait, can we shift the colors toward yellow?",
+    cue: "chat-7",
+  },
+  {
+    role: "assistant",
+    text: "Sure, here is the same palette but with yellow hues.",
+    cue: "chat-8",
+  },
 ] as const;
-
-const TERMINAL_LINES = [
-  "$ npx tsx theme-inverter.ts",
-  "  → obsidian-light-theme.json ✓",
-  "  → gold-light-theme.json ✓",
-  "  → turquoise-light-theme.json ✓",
-  "  → jade-light-theme.json ✓",
-  "  → quartz-light-theme.json ✓",
-  "  8 themes generated.",
-];
 
 function* streamText(
   txtRef: ReturnType<typeof createRef<Txt>>,
@@ -35,44 +48,39 @@ function* streamText(
   text: string,
   role: "user" | "assistant",
   random: ReturnType<typeof useRandom>,
+  duration: number,
 ) {
-  const baseDelay = role === "user" ? 0.022 : 0.032;
-  const jitter = role === "user" ? 0 : 0.024;
+  const charDelay = duration / text.length;
+  const jitter = role === "assistant" ? charDelay * 0.3 : 0;
 
   for (let i = 1; i <= text.length; i++) {
     txtRef().text(text.slice(0, i));
-
-    // 🔥 key: keep nudging layout so it grows while typing
     containerRef().height("100%");
-
-    const delay = baseDelay + (jitter > 0 ? random.nextFloat(0, jitter) : 0);
-    yield* waitFor(delay);
+    const delay = charDelay + (jitter > 0 ? random.nextFloat(-jitter, jitter) : 0);
+    yield* waitFor(Math.max(0.008, delay));
   }
 }
 
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
   const random = useRandom(42);
 
   const chatPanelRef = createRef<Rect>();
-  const termPanelRef = createRef<Rect>();
-  const connectorRef = createRef<Line>();
 
   const chatItemContainers = CHAT_LINES.map(() => createRef<Layout>());
   const chatBubbleRefs = CHAT_LINES.map(() => createRef<Rect>());
   const chatTxtRefs = CHAT_LINES.map(() => createRef<Txt>());
   const assistantDotRefs = CHAT_LINES.map(() => createRef<Rect>());
 
-  const termLineContainers = TERMINAL_LINES.map(() => createRef<Layout>());
-  const termLineRefs = TERMINAL_LINES.map(() => createRef<Txt>());
+  const obsidianWin = createRef<EditorWindow>();
+  const goldWin = createRef<EditorWindow>();
 
   view.add(
     <>
       {/* Chat panel */}
       <Rect
         ref={chatPanelRef}
-        width={420}
         layout
         radius={8}
         fill="#1f1f1e"
@@ -80,9 +88,8 @@ export default makeScene2D(function* (view) {
         lineWidth={2}
         x={-310}
         opacity={0}
-        clip
       >
-        <Layout layout direction="column" gap={10} padding={16} width={420}>
+        <Layout layout direction="column" gap={10} padding={24} width={720}>
           {CHAT_LINES.map((line, i) => (
             <Layout layout direction="column" height={0} clip ref={chatItemContainers[i]}>
               <Rect
@@ -95,17 +102,17 @@ export default makeScene2D(function* (view) {
                 paddingLeft={14}
                 paddingRight={14}
                 alignSelf={line.role === "user" ? "end" : "start"}
-                maxWidth={330}
-                scale={0.98}
+                maxWidth={720}
+                scale={1}
               >
                 <Txt
                   ref={chatTxtRefs[i]}
                   text=""
-                  fontSize={12}
+                  fontSize={18}
                   fill={BASE.textMid}
                   fontFamily="Open Sans"
                   textWrap
-                  maxWidth={310}
+                  maxWidth={720}
                 />
               </Rect>
 
@@ -127,61 +134,53 @@ export default makeScene2D(function* (view) {
         </Layout>
       </Rect>
 
-      {/* Connector */}
-      <Line
-        ref={connectorRef}
-        points={[
-          [-50, 0],
-          [50, 0],
-        ]}
-        stroke={palette.turquoise.dark.fg}
-        lineWidth={1.5}
-        lineDash={[6, 4]}
-        end={0}
-        opacity={0.6}
-      />
+      <Node x={500}>
+        {/* Gold window underneath, invisible at first */}
+        <EditorWindow
+          ref={goldWin}
+          accentColor={palette.gold.dark.mid}
+          bodyFill={palette.gold.dark.bg}
+          winWidth={480}
+          winHeight={240}
+          placeholderBaseOpacity={1}
+          opacity={0}
+        />
 
-      {/* Terminal panel */}
-      <Rect
-        ref={termPanelRef}
-        width={320}
-        layout
-        radius={8}
-        fill={BASE.bg}
-        stroke={BASE.surfaceHi}
-        lineWidth={2}
-        x={320}
-        opacity={0}
-        clip
-      >
-        <Layout layout direction="column" gap={8} padding={16}>
-          {TERMINAL_LINES.map((line, i) => (
-            <Layout layout height={0} clip ref={termLineContainers[i]}>
-              <Txt
-                ref={termLineRefs[i]}
-                text={line}
-                fontSize={12}
-                fill={i === 0 ? BASE.textMid : palette.jade.dark.fg}
-                fontFamily={BASE.mono}
-                opacity={0} // 👈 important
-              />
-            </Layout>
-          ))}
-        </Layout>
-      </Rect>
+        {/* Obsidian window on top */}
+        <EditorWindow
+          ref={obsidianWin}
+          accentColor={BASE.textMid}
+          bodyFill={BASE.surface}
+          winWidth={480}
+          winHeight={240}
+          placeholderBaseOpacity={0.24}
+          opacity={0}
+          scale={0.86}
+        />
+      </Node>
     </>,
   );
 
   // --- Chat ---
-
   yield* all(chatPanelRef().opacity(1, 0.4), chatPanelRef().position.x(-290, 0.6, easeInOutCubic));
+
+  yield* all(
+    obsidianWin().opacity(1, 0.6, easeInOutCubic),
+    obsidianWin().scale(1, 0.6, easeInOutCubic),
+  );
+
+  yield* waitFor(0.5);
+  yield floatIt(obsidianWin());
+  yield floatIt(goldWin());
+
   let lastAssistantIdx = -1;
 
   for (let i = 0; i < CHAT_LINES.length; i++) {
     const line = CHAT_LINES[i];
 
-    yield* chatItemContainers[i]().height("100%", 0.28, easeOutCubic);
+    yield* waitUntil(line.cue);
 
+    yield* chatItemContainers[i]().height("100%", 0.28, easeOutCubic);
     yield* chatBubbleRefs[i]().scale(1, 0.28, easeOutCubic);
 
     if (line.role === "user" && lastAssistantIdx !== -1) {
@@ -190,54 +189,32 @@ export default makeScene2D(function* (view) {
 
     if (line.role === "assistant") {
       yield* assistantDotRefs[i]().opacity(1, 0.15);
-      yield* waitFor(0.2);
+      yield* waitFor(0.15);
       lastAssistantIdx = i;
     }
 
-    yield* streamText(chatTxtRefs[i], chatItemContainers[i], line.text, line.role, random);
-
-    yield* waitFor(line.role === "user" ? 0.1 : 0.18);
+    const dur = useDuration(`${line.cue}-typing`);
+    yield* streamText(chatTxtRefs[i], chatItemContainers[i], line.text, line.role, random, dur);
   }
 
-  // --- Connector ---
-  yield* connectorRef().end(1, 0.5, easeInOutCubic);
-
-  // --- Terminal ---
-
-  yield* all(termPanelRef().opacity(1, 0.4), termPanelRef().position.x(270, 0.6, easeInOutCubic));
-  // 1. First line: typewriter + growth
-  yield* termLineContainers[0]().height("100%", 0.25, easeOutCubic);
-
-  for (let i = 1; i <= TERMINAL_LINES[0].length; i++) {
-    termLineRefs[0]().opacity(1);
-    termLineRefs[0]().text(TERMINAL_LINES[0].slice(0, i));
-    yield* waitFor(0.035);
-  }
-
-  // small pause before output appears
-  yield* waitFor(0.2);
-
-  // 2. Output lines: line-by-line (fast, slightly staggered)
-  yield* sequence(
-    0.12,
-    ...termLineContainers
-      .slice(1)
-      .map((container, i) =>
-        all(container().height("100%", 0.22, easeOutCubic), termLineRefs[i + 1]().opacity(1, 0.15)),
-      ),
+  yield* waitUntil("a-single-hue");
+  // Crossfade: obsidian out, gold in — slow and deliberate, like light through a gem
+  yield* all(
+    obsidianWin().opacity(0, 1.2, easeInOutCubic),
+    goldWin().opacity(1, 1.2, easeInOutCubic),
   );
 
-  yield* waitFor(1.2);
+  yield* waitFor(0.4);
 
-  // Outro
-  yield* all(connectorRef().end(0, 0.35, easeInOutCubic), connectorRef().opacity(0, 0.3));
+  // --- Outro ---
+  yield* waitUntil("chat-outro");
 
   yield* all(
     chatPanelRef().position.x(-350, 0.42, easeInOutCubic),
-    termPanelRef().position.x(330, 0.42, easeInOutCubic),
     chatPanelRef().opacity(0, 0.42),
-    termPanelRef().opacity(0, 0.42),
     chatPanelRef().scale(0.96, 0.42, easeOutCubic),
-    termPanelRef().scale(0.96, 0.42, easeOutCubic),
   );
+
+  // Fade out the two hero windows
+  yield* all(obsidianWin().opacity(0, 0.3), goldWin().opacity(0, 0.3));
 });

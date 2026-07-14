@@ -1,5 +1,30 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "monochrome",
+      "targetTime": 16.66247440771871
+    },
+    {
+      "name": "came-across",
+      "targetTime": 3.506590725284979
+    },
+    {
+      "name": "better-focus",
+      "targetTime": 23.019906237519116
+    },
+    {
+      "name": "less-loaded",
+      "targetTime": 30.549783238727738
+    },
+    {
+      "name": "winter-time",
+      "targetTime": 33.54396669443227
+    },
+    {
+      "name": "color-drained",
+      "targetTime": 40.14679353812844
+    }
+  ],
   "seed": 1423886671
 }

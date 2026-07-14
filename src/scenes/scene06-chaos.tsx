@@ -1,7 +1,17 @@
 import { makeScene2D, Rect, Txt, Layout } from "@motion-canvas/2d";
-import { all, waitFor, createRef, easeOutCubic, sequence } from "@motion-canvas/core";
+import {
+  all,
+  waitFor,
+  createRef,
+  easeOutCubic,
+  sequence,
+  chain,
+  waitUntil,
+  useDuration,
+} from "@motion-canvas/core";
 import { BASE, palette } from "../styles/palette";
 import { PillLabel } from "../components/PillLabel";
+import { addGroovyBackground } from "../lib/background";
 
 const JSON_ENTRIES = [
   '"editor.background": "#020202",',
@@ -18,28 +28,31 @@ const JSON_ENTRIES = [
   '"list.hoverBackground": "#141414",',
 ];
 
+// Each panel has a named cue — set the timing in the Motion Canvas editor
+// by dragging the event markers to match your voiceover
+const PANEL_CONFIGS = [
+  { x: 0, y: 0, speed: 1.0, entryDelay: 0.09, cue: "panel-1" },
+  { x: -600, y: -200, speed: 0.82, entryDelay: 0.11, cue: "panel-2" },
+  { x: 600, y: 200, speed: 1.18, entryDelay: 0.07, cue: "panel-3" },
+  { x: -600, y: 200, speed: 0.91, entryDelay: 0.1, cue: "panel-4" },
+  { x: 600, y: -200, speed: 1.35, entryDelay: 0.08, cue: "panel-5" },
+];
+
 export default makeScene2D(function* (view) {
-  view.fill(BASE.bg);
+  addGroovyBackground(view);
 
-  const panelConfigs = [
-    { x: 0, y: 0, speed: 1 },
-    { x: -600, y: -200, speed: 0.8 },
-    { x: 600, y: 200, speed: 1.2 },
-    { x: 0, y: 0, speed: 0.65 },
-    { x: -600, y: 200, speed: 0.9 },
-    { x: 600, y: -200, speed: 1.4 },
-  ];
-
-  const entryContainers = panelConfigs.map(() => JSON_ENTRIES.map(() => createRef<Layout>()));
-  const entryTexts = panelConfigs.map(() => JSON_ENTRIES.map(() => createRef<Txt>()));
-  const closingContainers = panelConfigs.map(() => createRef<Layout>());
-  const closingTexts = panelConfigs.map(() => createRef<Txt>());
+  const panelRefs = PANEL_CONFIGS.map(() => createRef<Rect>());
+  const entryContainers = PANEL_CONFIGS.map(() => JSON_ENTRIES.map(() => createRef<Layout>()));
+  const entryTexts = PANEL_CONFIGS.map(() => JSON_ENTRIES.map(() => createRef<Txt>()));
+  const closingContainers = PANEL_CONFIGS.map(() => createRef<Layout>());
+  const closingTexts = PANEL_CONFIGS.map(() => createRef<Txt>());
   const label = createRef<PillLabel>();
 
   view.add(
     <>
-      {panelConfigs.map((panel, panelIndex) => (
+      {PANEL_CONFIGS.map((panel, pi) => (
         <Rect
+          ref={panelRefs[pi]}
           width={560}
           layout
           radius={8}
@@ -49,6 +62,7 @@ export default makeScene2D(function* (view) {
           stroke={BASE.surfaceHi}
           lineWidth={2}
           clip
+          opacity={0}
         >
           <Layout layout direction="column" gap={7} padding={20}>
             <Txt
@@ -58,16 +72,10 @@ export default makeScene2D(function* (view) {
               fontFamily={BASE.mono}
             />
 
-            {JSON_ENTRIES.map((entry, entryIndex) => (
-              <Layout
-                layout
-                direction="column"
-                height={0}
-                clip
-                ref={entryContainers[panelIndex][entryIndex]}
-              >
+            {JSON_ENTRIES.map((entry, ei) => (
+              <Layout ref={entryContainers[pi][ei]} layout direction="column" height={0} clip>
                 <Txt
-                  ref={entryTexts[panelIndex][entryIndex]}
+                  ref={entryTexts[pi][ei]}
                   text={`  ${entry}`}
                   fontSize={12}
                   fill={BASE.text}
@@ -77,9 +85,9 @@ export default makeScene2D(function* (view) {
               </Layout>
             ))}
 
-            <Layout layout direction="column" height={0} clip ref={closingContainers[panelIndex]}>
+            <Layout ref={closingContainers[pi]} layout direction="column" height={0} clip>
               <Txt
-                ref={closingTexts[panelIndex]}
+                ref={closingTexts[pi]}
                 text="}"
                 fontSize={13}
                 fill={BASE.textMid}
@@ -101,36 +109,33 @@ export default makeScene2D(function* (view) {
     </>,
   );
 
+  // Panels are triggered by named audio cues — one cue per panel.
+  // After the cue fires, entries grow in sequentially on their own.
   yield* all(
-    ...entryContainers.map((containers, panelIndex) => {
-      const speed = panelConfigs[panelIndex].speed;
-      const delayOffset = panelIndex * 0.2;
-
-      return sequence(
-        0.08 * speed,
-
-        ...containers.map((container, i) =>
+    ...PANEL_CONFIGS.map((cfg, pi) =>
+      chain(
+        waitUntil(cfg.cue),
+        panelRefs[pi]().opacity(1, 0.35, easeOutCubic),
+        sequence(
+          cfg.entryDelay,
+          ...entryContainers[pi].map((container, ei) =>
+            all(
+              container().height("100%", 0.22 * cfg.speed, easeOutCubic),
+              entryTexts[pi][ei]().opacity(1, 0.18 * cfg.speed),
+            ),
+          ),
           all(
-            waitFor(delayOffset),
-            container().height("100%", 0.25 * speed, easeOutCubic),
-            entryTexts[panelIndex][i]().opacity(1, 0.15 * speed),
+            closingContainers[pi]().height("100%", 0.22 * cfg.speed, easeOutCubic),
+            closingTexts[pi]().opacity(1, 0.18 * cfg.speed),
           ),
         ),
-
-        all(
-          waitFor(delayOffset),
-          closingContainers[panelIndex]().height("100%", 0.25 * speed, easeOutCubic),
-          closingTexts[panelIndex]().opacity(1, 0.15 * speed),
-        ),
-      );
-    }),
+      ),
+    ),
   );
 
-  yield* waitFor(0.4);
+  yield* waitUntil("every-repo");
+  yield* label().opacity(1, 0.4);
 
-  yield* all(label().opacity(1, 0.4));
-
-  yield* waitFor(0.8);
-
-  yield* all(label().opacity(0, 0.4));
+  yield* waitUntil("fade-panels");
+  yield* all(...panelRefs.map((r) => r().opacity(0, 0.4)), label().opacity(0, 0.4));
 });

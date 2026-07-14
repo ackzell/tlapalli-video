@@ -172,15 +172,16 @@ export class TlapalliLogo extends Node {
     // Star backdrop
     this.add(
       <Path
+        zIndex={2}
         layout={false}
         data={STAR_PATH}
         x={() => (247.177 - VIEWBOX_HALF) * scale()}
         y={() => (243.651 - VIEWBOX_HALF) * scale()}
         scale={scale}
-        fill={() => palette.obsidian[this.mode()].border}
-        stroke={() => palette.obsidian[this.mode()].fg}
+        fill={() => palette.obsidian[this.mode() == 0 ? "dark" : "light"].border}
+        stroke={() => palette.obsidian[this.mode() == 0 ? "dark" : "light"].fg}
         lineWidth={() => Math.max(0.8, 2.2 * scale())}
-        opacity={0.38}
+        opacity={1}
       />,
     );
 
@@ -195,8 +196,8 @@ export class TlapalliLogo extends Node {
           x={() => gem.offsetX * scale()}
           y={() => gem.offsetY * scale()}
           scale={scale}
-          fill={() => palette[gem.variant][this.mode()].bg}
-          stroke={() => palette[gem.variant][this.mode()].fg}
+          fill={() => palette[gem.variant][this.mode() == 0 ? "dark" : "light"].bg}
+          stroke={() => palette[gem.variant][this.mode() == 0 ? "dark" : "light"].fg}
           lineWidth={() => gem.outerStrokeWidth * scale() * 1.8}
         />,
       );
@@ -207,7 +208,7 @@ export class TlapalliLogo extends Node {
           x={() => gem.offsetX * scale()}
           y={() => gem.offsetY * scale()}
           scale={scale}
-          fill={() => palette[gem.variant][this.mode()].fg}
+          fill={() => palette[gem.variant][this.mode() == 0 ? "dark" : "light"].fg}
           lineWidth={0}
         />,
       );
@@ -218,7 +219,7 @@ export class TlapalliLogo extends Node {
           x={() => gem.offsetX * scale()}
           y={() => gem.offsetY * scale()}
           scale={scale}
-          fill={() => palette[gem.variant][this.mode()].mid}
+          fill={() => palette[gem.variant][this.mode() == 0 ? "dark" : "light"].mid}
           lineWidth={0}
         />,
       );

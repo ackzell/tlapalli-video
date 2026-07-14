@@ -1,5 +1,70 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "tlapalli",
+      "targetTime": 4.190146852893223
+    },
+    {
+      "name": "means-color",
+      "targetTime": 7.52329796180298
+    },
+    {
+      "name": "the-language",
+      "targetTime": 9.453943406078523
+    },
+    {
+      "name": "nahuatl-duration",
+      "targetTime": 11.84663645381114
+    },
+    {
+      "name": "its-a-collection",
+      "targetTime": 15.657001835294297
+    },
+    {
+      "name": "collection-duration",
+      "targetTime": 21.31054995371976
+    },
+    {
+      "name": "obsidian",
+      "targetTime": 22.809974739244222
+    },
+    {
+      "name": "gold",
+      "targetTime": 23.976641247337696
+    },
+    {
+      "name": "turquoise",
+      "targetTime": 24.956641247337696
+    },
+    {
+      "name": "quartz",
+      "targetTime": 25.936641247337697
+    },
+    {
+      "name": "lapisLazuli",
+      "targetTime": 26.916641247337697
+    },
+    {
+      "name": "amethyst",
+      "targetTime": 27.896641247337698
+    },
+    {
+      "name": "jade",
+      "targetTime": 28.876641247337698
+    },
+    {
+      "name": "fireOpal",
+      "targetTime": 29.8566412473377
+    },
+    {
+      "name": "light-modes",
+      "targetTime": 33.11984890111185
+    },
+    {
+      "name": "fade-out",
+      "targetTime": 37.38728614913295
+    }
+  ],
   "seed": 2015882687
 }

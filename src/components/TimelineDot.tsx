@@ -43,7 +43,7 @@ export class TimelineDot extends Node {
         />
         <Txt
           text={() => this.label()}
-          fontSize={11}
+          fontSize={22}
           fill={BASE.textMid}
           fontFamily={BASE.titleFont}
           y={() => (this.labelBelow() ? 45 : -45)}

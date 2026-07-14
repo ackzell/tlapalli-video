@@ -1,5 +1,34 @@
 {
   "version": 0,
-  "timeEvents": [],
+  "timeEvents": [
+    {
+      "name": "panel-1",
+      "targetTime": 2.7021723952921612
+    },
+    {
+      "name": "panel-2",
+      "targetTime": 15.373758153077166
+    },
+    {
+      "name": "panel-3",
+      "targetTime": 12.305464104808825
+    },
+    {
+      "name": "panel-4",
+      "targetTime": 13.593432844229051
+    },
+    {
+      "name": "panel-5",
+      "targetTime": 10.1698669954272
+    },
+    {
+      "name": "every-repo",
+      "targetTime": 17.721802872139882
+    },
+    {
+      "name": "fade-panels",
+      "targetTime": 28.211186113141046
+    }
+  ],
   "seed": 1736736430
 }

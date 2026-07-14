@@ -13,13 +13,17 @@ import scene08 from "./scenes/scene08-aitools?scene";
 import scene09 from "./scenes/scene09-click?scene";
 import scene10 from "./scenes/scene10-showcase?scene";
 import scene11 from "./scenes/scene11-repos?scene";
+import scene11b from "./scenes/scene11b-scripts?scene";
 import scene12 from "./scenes/scene12-website?scene";
 import scene12b from "./scenes/scene12b-croptemplate?scene";
 import scene13 from "./scenes/scene13-reflection?scene";
 import scene14 from "./scenes/scene14-outro?scene";
 
+import audio from "../public/audio.flac";
+
 export default makeProject({
   experimentalFeatures: true,
+  audio,
   scenes: [
     // scene01,   // Cold open — logo assembles
     scene02, // Situation — context switching
@@ -32,6 +36,7 @@ export default makeProject({
     scene09, // Change — the click, all 8 gems
     scene10, // Result — gem showcase
     scene11, // Result — three repos
+    scene11b, // Result — scripts that generate and update themes
     scene12, // Result — the website
     scene12b, // Result — SVG crop pipeline
     scene13, // Reflection — timeline
